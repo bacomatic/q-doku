@@ -1,11 +1,13 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
+import "qrc:/sudoku/"
 
 Item {
     property alias startButton: startButton
     property alias resumeButton: resumeButton
     property alias sizeSelect: sizeSelect
+    property alias randomSeed: randomSeed
 
     RowLayout {
         anchors.horizontalCenter: parent.horizontalCenter
@@ -22,13 +24,13 @@ Item {
         text: qsTr(">")
         font.pointSize: 18
 
+        enabled: SudokuGame.inPlay
+        visible: SudokuGame.inPlay
+
         ToolTip.visible: hovered
         ToolTip.delay: 1000
         ToolTip.timeout: 5000
         ToolTip.text: "Resume your game"
-
-        enabled: application.gameInProgress
-        visible: application.gameInProgress
     }
 
     Button {
@@ -37,6 +39,11 @@ Item {
         y: 294
         text: qsTr("Start Game")
         font.pointSize: 13
+
+        ToolTip.visible: hovered
+        ToolTip.delay: 1000
+        ToolTip.timeout: 5000
+        ToolTip.text: "Start a new game using the current settings"
     }
 
     ComboBox {
@@ -46,6 +53,11 @@ Item {
         x: 260
         y: 159
         font.pointSize: 12
+
+        ToolTip.visible: hovered
+        ToolTip.delay: 1000
+        ToolTip.timeout: 5000
+        ToolTip.text: "Choose the size of the board you want to play"
     }
 
     Text {
@@ -53,16 +65,6 @@ Item {
         x: 165
         y: 168
         text: qsTr("Board Size:")
-        font.pixelSize: 18
-    }
-
-    TextEdit {
-        id: randomSeed
-        x: 260
-        y: 230
-        width: 120
-        height: 21
-        text: qsTr("0")
         font.pixelSize: 18
     }
 
@@ -84,5 +86,20 @@ Item {
         font.pixelSize: 64
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
+    }
+
+    TextField {
+        id: randomSeed
+        x: 260
+        y: 220
+        text: qsTr("0")
+        topPadding: 6
+        padding: 6
+        validator: IntValidator {bottom: 0;}
+
+        ToolTip.visible: hovered
+        ToolTip.delay: 1000
+        ToolTip.timeout: 5000
+        ToolTip.text: "Set the random number seed for the generator, set to 0 to use get a random board."
     }
 }

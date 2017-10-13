@@ -7,4 +7,3 @@
 - [ ] Add actual backend support (fetch a board)
 - [ ] Add game board to GamePage
 - [ ] Add game logic
-- [ ] Add puzzle generation logic (need difficulty selection for this)

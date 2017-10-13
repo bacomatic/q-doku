@@ -6,5 +6,12 @@
         <file>qtquickcontrols2.conf</file>
         <file>GamePage.qml</file>
         <file>GamePageForm.ui.qml</file>
+        <file>GameCell.qml</file>
+        <file>GameDividers.qml</file>
+    </qresource>
+    <qresource prefix="/sudoku">
+        <file>SudokuGame.qml</file>
+        <file>qmldir</file>
+        <file>BoardData.js</file>
     </qresource>
 </RCC>

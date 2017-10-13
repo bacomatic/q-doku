@@ -1,23 +1,16 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
+import "qrc:/sudoku/"
 
 Item {
     width: 640
     height: 480
+    property alias gameDividers: gameDividers
+    property alias boardGrid: boardGrid
     property alias backButton: backButton
     property alias forfeitButton: forfeitButton
-
-    Grid {
-        id: grid
-        x: 232
-        y: 8
-        width: 400
-        height: 400
-        spacing: 1
-        rows: 3
-        columns: 3
-    }
+    property alias cellList: cellList
 
     Button {
         id: backButton
@@ -39,5 +32,30 @@ Item {
         y: 432
         text: qsTr("Forfeit")
         font.pointSize: 18
+    }
+
+    GridLayout {
+        id: boardGrid
+        x: 120
+        y: 20
+        width: 400
+        height: 400
+        columnSpacing: 0
+        rowSpacing: 0
+        rows: SudokuGame.rowSize
+        columns: SudokuGame.rowSize
+    }
+
+    ListModel {
+        id: cellList
+    }
+
+    GameDividers {
+        id: gameDividers
+        x: 120
+        y: 20
+        width: 400
+        height: 400
+        z: 1
     }
 }
