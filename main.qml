@@ -65,6 +65,7 @@ ApplicationWindow {
         while (cellList.count > 0) {
             var cell = cellList.get(0);
             cell.item.parent = null;
+            cell.item.destroy();
             cellList.remove(cell);
         }
         cellList.clear();

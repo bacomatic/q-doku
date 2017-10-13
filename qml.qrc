@@ -8,6 +8,7 @@
         <file>GamePageForm.ui.qml</file>
         <file>GameCell.qml</file>
         <file>GameDividers.qml</file>
+        <file>CellLogic.js</file>
     </qresource>
     <qresource prefix="/sudoku">
         <file>SudokuGame.qml</file>
