@@ -13,7 +13,7 @@
 	- [ ] Add puzzle validation, error detection
 	- [ ] Error/Warning highlighting
 - [ ] Hide main menu in a hamburger instead of goofy swipe view
-- [ ] License headers...
-- [ ] Better board grid generation
-- [ ] Change to use model/delegate model instead of JS array
-- [ ] Separate logic code from qml, move to backing JS code
+- [X] License headers...
+- [X] Better board grid generation
+- [X] Change to use model/delegate model instead of JS array
+- [ ] Move more game logic to SudokuGame
