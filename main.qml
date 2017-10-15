@@ -57,50 +57,25 @@ ApplicationWindow {
     }
 
     function buildBoard() {
-        var cellList = gamePage.cellList;
-        var gameBoard = gamePage.boardGrid;
+//        var gameBoard = gamePage.boardGrid;
 
-        // Clear the existing cell list, this should also remove all cells
-        // from the board grid
-        while (cellList.count > 0) {
-            var cell = cellList.get(0);
-            cell.item.parent = null;
-            cell.item.destroy();
-            cellList.remove(cell);
-        }
-        cellList.clear();
+//        // FIXME: Use a delegate (?) to construct GameCell automatically?
+//        var model = SudokuGame.boardModel;
+//        for (var ii = 0; ii < model.count; ii++) {
+//            var cellData = model.get(ii);
+//            var cellItem = gameCellComp.createObject(gameBoard,
+//                {
+//                    cellIndex: ii,
+//                    cellValue: cellData.cellValue,
+//                    guessValue: (cellData.locked ? cellData.cellValue : -1), // locked cells must show cell value
+//                    row: cellData.row,
+//                    column: cellData.column,
+//                    locked: cellData.locked
+//                });
 
-
-        var board = SudokuGame.board.board;
-        var puzzle = SudokuGame.board.puzzle;
-
-        for (var ii = 0; ii < SudokuGame.cellCount; ii++) {
-            var row = SudokuGame.rowForCell(ii);
-            var column =  SudokuGame.columnForCell(ii);
-            var box = SudokuGame.boxForCell(ii);
-            var locked = (puzzle[ii] === 1)
-
-            var cellItem = gameCellComp.createObject(gameBoard,
-                {
-                    cellIndex: ii,
-                    cellValue: board[ii],
-                    guessValue: (locked ? board[ii] : 0), // locked cells must show cell value
-                    row: row,
-                    column: column,
-                    locked: locked
-                });
-
-            cellItem.Layout.fillWidth = true;
-            cellItem.Layout.fillHeight = true;
-
-            cellList.append({
-                                index: ii,
-                                row: row,
-                                column: column,
-                                box: box,
-                                item: cellItem
-                            });
-        }
+//            cellItem.Layout.fillWidth = true;
+//            cellItem.Layout.fillHeight = true;
+//        }
         gamePage.gameDividers.refresh();
     }
 

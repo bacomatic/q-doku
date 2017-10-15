@@ -6,11 +6,10 @@ import "qrc:/sudoku/"
 Item {
     width: 640
     height: 480
+    property alias gridView: gridView
     property alias gameDividers: gameDividers
-    property alias boardGrid: boardGrid
     property alias backButton: backButton
     property alias forfeitButton: forfeitButton
-    property alias cellList: cellList
 
     Button {
         id: backButton
@@ -28,34 +27,31 @@ Item {
 
     Button {
         id: forfeitButton
-        x: 59
-        y: 432
+        x: 8
+        y: 385
         text: qsTr("Forfeit")
         font.pointSize: 18
     }
 
-    GridLayout {
-        id: boardGrid
+    GridView {
+        id: gridView
         x: 120
         y: 20
-        width: 400
-        height: 400
-        columnSpacing: 0
-        rowSpacing: 0
-        rows: SudokuGame.rowSize
-        columns: SudokuGame.rowSize
-    }
-
-    ListModel {
-        id: cellList
+        width: 432
+        height: 432
+        cellHeight: gridCellHeight
+        cellWidth: gridCellWidth
+        interactive: false
+        delegate: gameCellDelegate
+        model: SudokuGame.boardModel
     }
 
     GameDividers {
         id: gameDividers
         x: 120
         y: 20
-        width: 400
-        height: 400
+        width: 432
+        height: 432
         z: 1
     }
 }

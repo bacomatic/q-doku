@@ -1,6 +1,7 @@
 pragma Singleton
 
 import QtQuick 2.7
+import QtQml.Models 2.2
 import "BoardData.js" as BoardData
 
 /*
@@ -22,8 +23,6 @@ QtObject {
     readonly property int rowSize: {size * size}
     readonly property int cellCount: {rowSize * rowSize}
 
-    property var board: null
-
     // Which cell is currently selected, -1 is none (zero is valid)
     property int activeCell: -1
 
@@ -31,6 +30,8 @@ QtObject {
     readonly property int activeRow: (activeCell == -1 ? -1 : rowForCell(activeCell))
     readonly property int activeColumn: (activeCell == -1 ? -1 : columnForCell(activeCell))
     readonly property int activeBox: (activeCell == -1 ? -1 : boxForCell(activeCell))
+
+    readonly property ListModel boardModel: ListModel {}
 
     // container is the parent container to add the cells to
     // cellList is expected to be ListModel
@@ -43,7 +44,33 @@ QtObject {
             size = newSize;
         }
         console.log("Generating board size = " + size + " cellCount = " + cellCount);
-        board = BoardData.getBoard(size, randomSeed);
+        var gameBoard = BoardData.getBoard(size, randomSeed);
+
+        boardModel.clear();
+        boardModel.columnCount(rowSize);
+        boardModel.rowCount(rowSize);
+
+        var board = gameBoard.board;
+        var puzzle = gameBoard.puzzle;
+
+        for (var index = 0; index < cellCount; index++) {
+            var locked = puzzle[index] === 1;
+            boardModel.append({
+                                  // board layout
+                                  cellIndex: index,
+                                  cellRow: rowForCell(index),
+                                  cellColumn: columnForCell(index),
+                                  cellBox: boxForCell(index),
+
+                                  // starting cell info
+                                  cellValue: board[index],
+                                  cellLocked: locked,
+
+                                  // game logic
+                                  cellGuess: (locked ? board[index] : 0),
+                                  cellError: false
+                              });
+        }
     }
 
     function rowForCell(index) {
