@@ -45,21 +45,12 @@ QtObject {
     readonly property int rowSize: {size * size}
     readonly property int cellCount: {rowSize * rowSize}
 
-    // Which cell is currently selected, -1 is none (zero is valid)
-    property int activeCell: -1
-
-    // The row, column and box of the currently selected cell
-    readonly property int activeRow: (activeCell == -1 ? -1 : rowForCell(activeCell))
-    readonly property int activeColumn: (activeCell == -1 ? -1 : columnForCell(activeCell))
-    readonly property int activeBox: (activeCell == -1 ? -1 : boxForCell(activeCell))
-
     readonly property ListModel boardModel: ListModel {}
 
     // container is the parent container to add the cells to
     // cellList is expected to be ListModel
     function newBoard() {
         // reset game state
-        activeCell = -1;
         if (newSize === 0) {
             size = Math.floor(Math.random() * 2) + 2; // should choose 2-3 inclusively
         } else {
@@ -96,15 +87,24 @@ QtObject {
     }
 
     function rowForCell(index) {
+        if (index < 0 || index > cellCount) {
+            return -1;
+        }
         return Math.floor(index / rowSize);
     }
 
     function columnForCell(index) {
+        if (index < 0 || index > cellCount) {
+            return -1;
+        }
         return Math.floor(index % rowSize);
     }
 
     function boxForCell(index) {
-        // box length is size cubed, so box index is cell index / size^3
+        if (index < 0 || index > cellCount) {
+            return -1;
+        }
+        // box length is size cubed, so box index is cell index / size^4
         return Math.floor(index / cellCount);
     }
 }

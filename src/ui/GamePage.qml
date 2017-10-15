@@ -37,9 +37,68 @@ GamePageForm {
         gridView.height / SudokuGame.rowSize;
     }
 
+    readonly property int activeRow: {
+        SudokuGame.rowForCell(gridView.currentIndex);
+    }
+
+    readonly property int activeColumn: {
+        SudokuGame.columnForCell(gridView.currentIndex);
+    }
+
     Component.onCompleted: {
+        gridView.currentIndex = -1; // start with no cell selected
         backButton.onClicked.connect(goBack);
         forfeitButton.onClicked.connect(forfeit);
+
+        console.log("grid view has focus: " + gridView.activeFocus);
+    }
+
+    Component {
+        id: cellHighlighter
+        Item {
+            // x, y, width and height will be set to the current item coordinates and size
+            z: 1
+
+            Rectangle {
+                anchors.fill: parent
+                color: "#400020FF"
+            }
+
+            // NOTE: coordinates here are relative to parent!
+            // Row highlighter
+                // right
+            Rectangle {
+                x: -gridView.currentItem.x
+                y: 0
+                width: gridView.currentItem.x
+                height: parent.height
+                color: "#40404040"
+            }
+                // left
+            Rectangle {
+                x: parent.width
+                y: 0
+                width: gridView.width - gridView.currentItem.x - parent.width
+                height: parent.height
+                color: "#40404040"
+            }
+                // top
+            Rectangle {
+                x: 0
+                y: -gridView.currentItem.y
+                width: parent.width
+                height: gridView.currentItem.y
+                color: "#40404040"
+            }
+                // bottom
+            Rectangle {
+                x: 0
+                y: parent.height
+                width: parent.width
+                height: gridView.height - gridView.currentItem.y - parent.height
+                color: "#40404040"
+            }
+        }
     }
 
     /*
@@ -65,12 +124,21 @@ GamePageForm {
             width: gridCellWidth
             height: gridCellHeight
 
+            focus: true
+            Keys.onDigit2Pressed: {
+                console.log("2");
+            }
+
+            Keys.onDigit1Pressed: {
+                console.log("1");
+            }
+
             MouseArea {
                 id: cellTile
                 anchors.fill: parent
 
                 onClicked: {
-                    SudokuGame.activeCell = cellIndex;
+                    gridView.currentIndex = cellIndex;
                 }
             }
 
@@ -80,21 +148,7 @@ GamePageForm {
                 height: parent.height
                 border.color: "lightgrey"
                 border.width: 1
-                color: {
-                    // base color = gainsboro if locked, white if not
-                    var baseColor = cellLocked ? "gainsboro" : "white";
-
-                    // highlight color:
-                    if (SudokuGame.activeCell === cellIndex) {
-                        // give a light blue tint
-                        return Qt.tint(baseColor, "lightsteelblue");
-                    } else if (SudokuGame.activeRow === cellRow
-                               || SudokuGame.activeColumn === cellColumn) {
-                        // row or column highlighted, darken by a small amount
-                        return Qt.darker(baseColor, 1.25);
-                    } // else no highlight
-                    return baseColor;
-                }
+                color: cellLocked ? "gainsboro" : "white"
             }
 
             Text {
@@ -110,10 +164,10 @@ GamePageForm {
             }
 
             Connections {
-                target: SudokuGame
-                onActiveCellChanged: {
-                    if (SudokuGame.activeCell === cellIndex) {
-                        console.log("I have been activated! (index = "+cellIndex+")");
+                target: gridView
+                onCurrentIndexChanged: {
+                    if (gridView.currentIndex === cellIndex) {
+//                        console.log("Selected in GridView! " + cellIndex);
                     }
                 }
             }

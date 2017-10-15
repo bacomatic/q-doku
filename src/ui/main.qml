@@ -61,6 +61,9 @@ ApplicationWindow {
         swipeView.setCurrentIndex(1);
 
         SudokuGame.newBoard();
+        // FIXME: there has to be a better way to do this...
+        gamePage.focus = true;
+        gamePage.gridView.focus = true;
         gamePage.gameDividers.refresh();
     }
 

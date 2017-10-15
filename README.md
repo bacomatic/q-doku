@@ -8,7 +8,7 @@
 - [X] Add game board to GamePage
 - [ ] Add game logic
 	- [X] Add mouse selection and cell highlighting
-	- [ ] Add keyboard navigation
+	- [X] Add keyboard navigation
 	- [ ] Add number entry
 	- [ ] Add puzzle validation, error detection
 	- [ ] Error/Warning highlighting

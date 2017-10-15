@@ -19,7 +19,6 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-
 import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
@@ -61,9 +60,18 @@ Item {
         y: 20
         width: 432
         height: 432
+        clip: true
+        boundsBehavior: Flickable.StopAtBounds
+        flickableDirection: Flickable.AutoFlickDirection
+        highlightRangeMode: GridView.ApplyRange
+        highlightFollowsCurrentItem: true
         cellHeight: gridCellHeight
         cellWidth: gridCellWidth
-        interactive: false
+
+        focus: true
+        keyNavigationWraps: false
+
+        highlight: cellHighlighter
         delegate: gameCellDelegate
         model: SudokuGame.boardModel
     }
