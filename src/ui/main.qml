@@ -56,48 +56,11 @@ ApplicationWindow {
         }
     }
 
-    property var gameCellComp;
-    property var cellList: [];
-
     function startNewGame() {
         SudokuGame.inPlay = true;
         swipeView.setCurrentIndex(1);
 
         SudokuGame.newBoard();
-
-        gameCellComp = Qt.createComponent("GameCell.qml");
-        if (gameCellComp.status === Component.Ready) {
-            buildBoard();
-        } else {
-            console.log("GameCell load status: " + gameCellComp.status);
-            if (gameCellComp.status === Component.Error) {
-                console.log(gameCellComp.errorString());
-            }
-
-            gameCellComp.statusChanged.connect(buildBoard);
-        }
-    }
-
-    function buildBoard() {
-//        var gameBoard = gamePage.boardGrid;
-
-//        // FIXME: Use a delegate (?) to construct GameCell automatically?
-//        var model = SudokuGame.boardModel;
-//        for (var ii = 0; ii < model.count; ii++) {
-//            var cellData = model.get(ii);
-//            var cellItem = gameCellComp.createObject(gameBoard,
-//                {
-//                    cellIndex: ii,
-//                    cellValue: cellData.cellValue,
-//                    guessValue: (cellData.locked ? cellData.cellValue : -1), // locked cells must show cell value
-//                    row: cellData.row,
-//                    column: cellData.column,
-//                    locked: cellData.locked
-//                });
-
-//            cellItem.Layout.fillWidth = true;
-//            cellItem.Layout.fillHeight = true;
-//        }
         gamePage.gameDividers.refresh();
     }
 

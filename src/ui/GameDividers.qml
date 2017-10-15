@@ -50,7 +50,7 @@ Item {
             ctx.lineWidth = 2.0;
 
             // number of dividers in each direction is size - 1
-            for (var ii = 1; ii <= gameSize; ii++) {
+            for (var ii = 1; ii < gameSize; ii++) {
                 // horizontal divider
                 ctx.beginPath();
                 ctx.moveTo(0, boxHeight * ii);
