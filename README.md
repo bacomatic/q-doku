@@ -3,7 +3,7 @@
 
 
 - [ ] Add more docs and stuff
-- [ ] Restructure project so it isn't a pile of spaghetti
+- [X] Restructure project so it isn't a pile of spaghetti
 - [ ] Add actual backend support (fetch a board)
 - [X] Add game board to GamePage
 - [ ] Add game logic
