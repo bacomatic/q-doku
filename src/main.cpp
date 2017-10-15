@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     engine.addImportPath("qrc:/sudoku");
-    engine.load(QUrl(QLatin1String("qrc:/main.qml")));
+    engine.load(QUrl(QLatin1String("qrc:/ui/main.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;
 
