@@ -125,12 +125,25 @@ GamePageForm {
             height: gridCellHeight
 
             focus: true
-            Keys.onDigit2Pressed: {
-                console.log("2");
-            }
+            Keys.onPressed: {
+                if (cellLocked) return; // can't modify locked cells
 
-            Keys.onDigit1Pressed: {
-                console.log("1");
+                var numPressed = -1;
+                // FIXME: probably should move this to SudokuGame
+                var maxNum = SudokuGame.size === 2 ? 4 : 9;
+
+                // Handle number key entry
+                // Key_0 = 0x30, Key_9 = 0x39, so we can just do some easy math here
+                if ((event.key >= Qt.Key_0) && (event.key <= Qt.Key_9)) {
+                    numPressed = event.key - Qt.Key_0;
+                }
+                //  TODO: A-F for size 4 games
+
+                // zero key clears the current guess, so it's valid
+                if (numPressed >= 0 && numPressed <= maxNum) {
+                    cellGuess = numPressed;
+                    event.accepted = true;
+                }
             }
 
             MouseArea {
