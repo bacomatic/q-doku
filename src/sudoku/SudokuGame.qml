@@ -47,8 +47,11 @@ QtObject {
 
     readonly property ListModel boardModel: ListModel {}
 
-    // container is the parent container to add the cells to
-    // cellList is expected to be ListModel
+    // two dimensional arrays, these contain indices only
+    readonly property var rowList: []
+    readonly property var columnList: []
+    readonly property var boxList: []
+
     function newBoard() {
         // reset game state
         if (newSize === 0) {
@@ -66,23 +69,99 @@ QtObject {
         var board = gameBoard.board;
         var puzzle = gameBoard.puzzle;
 
+        // rebuild row, column, box lists
+        while (rowList.pop() !== undefined) {}
+        while (columnList.pop() !== undefined) {}
+        while (boxList.pop() !== undefined) {}
+
+        // initialize each with empty arrays
+        for (var index = 0; index < rowSize; index++) {
+            rowList[index] = [];
+            columnList[index] = [];
+            boxList[index] = [];
+        }
+
         for (var index = 0; index < cellCount; index++) {
             var locked = puzzle[index] === 1;
-            boardModel.append({
-                                  // board layout
-                                  cellIndex: index,
-                                  cellRow: rowForCell(index),
-                                  cellColumn: columnForCell(index),
-                                  cellBox: boxForCell(index),
+            var guess = locked ? board[index] : 0;
 
-                                  // starting cell info
-                                  cellValue: board[index],
-                                  cellLocked: locked,
+            var newCell = {
+                // board layout
+                cellIndex: index,
+                cellRow: rowForCell(index),
+                cellColumn: columnForCell(index),
+                cellBox: boxForCell(index),
 
-                                  // game logic
-                                  cellGuess: (locked ? board[index] : 0),
-                                  cellError: false
-                              });
+                // starting cell info
+                cellValue: board[index],
+                cellLocked: locked,
+
+                // game logic
+                cellGuess: guess,
+                cellError: false
+            };
+            boardModel.append(newCell);
+
+            rowList[newCell.cellRow].push(index);
+            columnList[newCell.cellColumn].push(index);
+            boxList[newCell.cellBox].push(index);
+        }
+    }
+
+    function setCellGuess(index, guess) {
+        if (index < 0 || index > cellCount) {
+            console.log("Error: cell index out of bounds: " + index);
+            return;
+        }
+        if (guess < 0 || guess > rowSize) {
+            console.log("Error: guess value out of bounds: " + guess);
+            return;
+        }
+
+        boardModel.setProperty(index, "cellGuess", guess);
+        validatePuzzle();
+    }
+
+    // Check if the two given cells match, set error on match
+    // false if both cells have the same index
+    // false if either cell has no guess (0)
+    // else true if cell guesses match
+    function checkGuessMatch(aIndex) {
+        // second cell is passed as "this" arg to forEach
+        var a = boardModel.get(aIndex);
+        var b = this;
+
+        // check if the cells match, if they do set error on both
+        if ((a.cellIndex === b.cellIndex) || (a.cellGuess === 0) || (b.cellGuess === 0)) {
+            return;
+        }
+        if (a.cellGuess === b.cellGuess) {
+            a.cellError = b.cellError = true;
+        }
+    }
+
+    // Validate the entire puzzle board
+    function validatePuzzle() {
+        // clear error flags
+        for (var index = 0; index < boardModel.count; index++) {
+            boardModel.get(index).cellError = false;
+        }
+
+        // for each entry in boardModel
+        // FIXME: Can be optimized...
+        for (var index = 0; index < boardModel.count; index++) {
+            var cell = boardModel.get(index);
+            // if already has error or has no guessed value, just skip it
+            if (cell.cellError || cell.cellGuess < 1) continue;
+
+            // TODO: We could just put these in the cell object itself for easier access
+            var row = rowList[cell.cellRow];
+            var col = columnList[cell.cellColumn];
+            var box = boxList[cell.cellBox];
+
+            row.forEach(checkGuessMatch, cell);
+            col.forEach(checkGuessMatch, cell);
+            box.forEach(checkGuessMatch, cell);
         }
     }
 
@@ -104,7 +183,8 @@ QtObject {
         if (index < 0 || index > cellCount) {
             return -1;
         }
-        // box length is size cubed, so box index is cell index / size^4
-        return Math.floor(index / cellCount);
+        var boxY = Math.floor(rowForCell(index) / size);
+        var boxX = Math.floor(columnForCell(index) / size);
+        return boxX + boxY * size;
     }
 }

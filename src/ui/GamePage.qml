@@ -141,8 +141,8 @@ GamePageForm {
 
                 // zero key clears the current guess, so it's valid
                 if (numPressed >= 0 && numPressed <= maxNum) {
-                    cellGuess = numPressed;
                     event.accepted = true;
+                    SudokuGame.setCellGuess(cellIndex, numPressed);
                 }
             }
 
@@ -170,7 +170,7 @@ GamePageForm {
                 text: cellGuess
                 font.family: "Helvetica"
                 font.pointSize: 24
-                color: "black"
+                color: cellError ? "red" : "black"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 visible: (cellGuess !== 0) || cellLocked

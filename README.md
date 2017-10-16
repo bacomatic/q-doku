@@ -9,11 +9,11 @@
 - [ ] Add game logic
 	- [X] Add mouse selection and cell highlighting
 	- [X] Add keyboard navigation
-	- [ ] Add number entry
-	- [ ] Add puzzle validation, error detection
-	- [ ] Error/Warning highlighting
+	- [X] Add number entry
+	- [X] Add puzzle validation, error detection
+	- [X] Error/Warning highlighting
+	- [ ] Add game over logic
 - [ ] Hide main menu in a hamburger instead of goofy swipe view
 - [X] License headers...
 - [X] Better board grid generation
 - [X] Change to use model/delegate model instead of JS array
-- [ ] Move more game logic to SudokuGame
