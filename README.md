@@ -1,10 +1,13 @@
 # Q-Doku!
 #### Qt5 based Sudoku game that uses the sudoku-serve backend for board generation.
 
-
+TODO:
 - [ ] Add more docs and stuff
+	- [ ] About box
+	- [ ] Splash screen
 - [X] Restructure project so it isn't a pile of spaghetti
 - [ ] Add actual backend support (fetch a board)
+	- [ ] Remove demo boards
 - [X] Add game board to GamePage
 - [ ] Add game logic
 	- [X] Add mouse selection and cell highlighting
@@ -17,3 +20,20 @@
 - [X] License headers...
 - [X] Better board grid generation
 - [X] Change to use model/delegate model instead of JS array
+- [ ] Start new game on startup, if none in progress
+- [ ] Settings storage, remember things between launches
+- [ ] Save game on exit, restore on launch
+- [ ] Gameplay statistics would be nice (not available during game play)
+	- [ ] Time spent each game
+	- [ ] Guesses made
+	- [ ] Correct guesses made
+	- [ ] Guess error rate
+
+Features requiring backend work:
+- [ ] Actual puzzle generation
+- [ ] Selectable puzzle difficulties
+- [ ] Different configurations, e.g., Samurai boards
+
+BUGS:
+- [ ] Left/right arrow navigation wraps around to prev/next row
+- [ ] Row/Col highlight bar doesn't animate shrinking when cell selection moves
