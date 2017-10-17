@@ -22,7 +22,7 @@
 
 import QtQuick 2.7
 import QtQuick.Dialogs 1.2
-import QtQuick.Controls 2.0
+import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 import "qrc:/sudoku/"
 
@@ -32,10 +32,88 @@ ApplicationWindow {
     width: 640
     height: 480
     title: qsTr("Q - Doku!")
-    minimumHeight: 480
-    maximumHeight: 480
+    minimumHeight: 520
+    maximumHeight: 520
     minimumWidth: 640
     maximumWidth: 640
+
+    property bool inPlay: false
+
+    Shortcut {
+        sequence: StandardKey.New
+        onActivated: startNewGame()
+    }
+
+    Shortcut {
+        // StandardKey.Quit is not supported on Windows
+        sequence: "CTRL+Q" // StandardKey.Quit
+        onActivated: Qt.quit()
+    }
+
+    header: ToolBar {
+        RowLayout {
+            anchors.fill: parent
+
+            ToolButton {
+                id: hamburgerButton
+                text: "\u2630"
+                contentItem: Text {
+                    text: parent.text
+                    font.pointSize: 16
+                    color: "#606060"
+                }
+
+                onClicked: mainMenu.open()
+
+                Menu {
+                    id: mainMenu
+                    MenuItem {
+                        text: qsTr("New Game")
+                        onClicked: startNewGame()
+                    }
+
+                    MenuItem {
+                        text: qsTr("New Game with Random Seed");
+                        onClicked: reqRandomSeed()
+                    }
+
+                    MenuSeparator {}
+
+                    MenuItem {
+                        text: qsTr("Quit")
+                        onClicked: Qt.quit()
+                    }
+                }
+            }
+
+            Label {
+                text: "Q-Doku!"
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: Qt.AlignVCenter
+                Layout.fillWidth: true
+                font.pointSize: 16
+            }
+
+            ToolButton {
+                id: settingsButton
+                text: "\u2699"
+                contentItem: Text {
+                    text: parent.text
+                    font.pointSize: 16
+                    color: "#606060"
+                }
+
+                onClicked: {
+                    console.log("Settings!");
+                    if (settingsDrawer.visible) {
+                        settingsDrawer.close()
+                    } else {
+                        settingsDrawer.open();
+                    }
+                }
+            }
+        }
+    }
 
     MessageDialog {
         id: newGameAlert
@@ -46,68 +124,96 @@ ApplicationWindow {
         standardButtons: StandardButton.Yes | StandardButton.No
 
         onYes: {
-            console.log("User *really* wants to start a new game, let them.");
-            application.startNewGame();
             newGameAlert.close();
+
+            inPlay = false;
+            application.startNewGame();
         }
         onNo: {
-            console.log("Phew... user does NOT want to abandon their current game!");
             newGameAlert.close();
+        }
+    }
+
+    Dialog {
+        id: requestRandomSeed
+        visible: false
+        title: qsTr("Enter random seed")
+        standardButtons: StandardButton.Cancel | StandardButton.Ok
+
+        contentItem: Item {
+            implicitWidth: 400
+            implicitHeight: 120
+
+            TextArea {
+                id: textArea
+                x: 8
+                y: 8
+                width: 384
+                height: 52
+                text: "Please enter a random seed to be used to generate a new board."
+                wrapMode: Text.WordWrap
+                font.pointSize: 12
+            }
+
+            TextField {
+                id: textField
+                x: 139
+                y: 66
+                width: 253
+                height: 40
+                text: qsTr("0")
+                validator: IntValidator {}
+                horizontalAlignment: Text.AlignRight
+                font.pointSize: 12
+            }
+        }
+
+        onAccepted: {
+            requestRandomSeed.close()
+            inPlay = false;
+
+            // Generate new game with given random seed
+            SudokuGame.randomSeed = Number(textField.text);
+            startNewGame();
+
+            // Reset for the next game
+            textField.text = "0";
+            SudokuGame.randomSeed = 0;
+        }
+
+        onRejected: {
+            textField.text = "0";
+            SudokuGame.randomSeed = 0;
+            requestRandomSeed.close()
         }
     }
 
     function startNewGame() {
-        SudokuGame.inPlay = true;
-        swipeView.setCurrentIndex(1);
-
-        SudokuGame.newBoard();
-        // FIXME: there has to be a better way to do this...
-        gamePage.focus = true;
-        gamePage.gridView.focus = true;
-        gamePage.gameDividers.refresh();
+        if (inPlay) {
+            // Pop up an alert asking to abandon the current game
+            newGameAlert.open();
+        } else {
+            inPlay = true;
+            SudokuGame.newBoard();
+            gamePage.reset();
+        }
     }
 
-    SwipeView {
-        id: swipeView
-        anchors.fill: parent
-        interactive: false // disable swipe by mouse/gesture as it breaks app logic
+    function reqRandomSeed() {
+        requestRandomSeed.open()
+    }
 
-        MainMenu {
-            onStartNewGame: {
-                if (SudokuGame.inPlay) {
-                    // Pop up an alert asking to abandon the current game
-                    newGameAlert.open();
-                } else {
-                    application.startNewGame();
-                }
-            }
-
-            onResumeGame: {
-                swipeView.setCurrentIndex(1);
-            }
-
-            onSelectNewSize: {
-                console.log("New size: " + size);
-                SudokuGame.newSize = size;
-            }
-
-            onSetRandomSeed: {
-                console.log("New seed: " + seed);
-                SudokuGame.randomSeed = seed;
-            }
+    // Settings drawer
+    Drawer {
+        id: settingsDrawer
+        width: application.width * 0.90
+        height: application.height
+        Settings {
+            id: settingsForm
         }
+    }
 
-        GamePage {
-            id: gamePage
-
-            onGoBack: {
-                swipeView.setCurrentIndex(0);
-            }
-
-            onForfeit: {
-                SudokuGame.inPlay = false;
-                swipeView.setCurrentIndex(0);
-            }
-        }
+    GamePage {
+        id: gamePage
     }
 }

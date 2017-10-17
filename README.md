@@ -16,7 +16,7 @@ TODO:
 	- [X] Add puzzle validation, error detection
 	- [X] Error/Warning highlighting
 	- [ ] Add game over logic
-- [ ] Hide main menu in a hamburger instead of goofy swipe view
+- [X] Hide main menu in a hamburger instead of goofy swipe view
 - [X] License headers...
 - [X] Better board grid generation
 - [X] Change to use model/delegate model instead of JS array

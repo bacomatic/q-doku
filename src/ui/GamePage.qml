@@ -26,9 +26,6 @@ import "qrc:/sudoku/"
 GamePageForm {
     id: root
 
-    signal goBack();
-    signal forfeit();
-
     property int gridCellWidth: {
         gridView.width / SudokuGame.rowSize;
     }
@@ -45,12 +42,11 @@ GamePageForm {
         SudokuGame.columnForCell(gridView.currentIndex);
     }
 
-    Component.onCompleted: {
-        gridView.currentIndex = -1; // start with no cell selected
-        backButton.onClicked.connect(goBack);
-        forfeitButton.onClicked.connect(forfeit);
-
-        console.log("grid view has focus: " + gridView.activeFocus);
+    function reset() {
+        gamePage.focus = true;
+        gamePage.gridView.focus = true;
+        gamePage.gridView.currentIndex = -1;
+        gamePage.gameDividers.refresh();
     }
 
     Component {
@@ -58,6 +54,9 @@ GamePageForm {
         Item {
             // x, y, width and height will be set to the current item coordinates and size
             z: 1
+
+            property int currentItemX: gridView.currentItem ? gridView.currentItem.x : 0
+            property int currentItemY: gridView.currentItem ? gridView.currentItem.y : 0
 
             Rectangle {
                 anchors.fill: parent
@@ -68,9 +67,9 @@ GamePageForm {
             // Row highlighter
                 // right
             Rectangle {
-                x: -gridView.currentItem.x
+                x: -currentItemX
                 y: 0
-                width: gridView.currentItem.x
+                width: currentItemX
                 height: parent.height
                 color: "#40404040"
             }
@@ -78,16 +77,16 @@ GamePageForm {
             Rectangle {
                 x: parent.width
                 y: 0
-                width: gridView.width - gridView.currentItem.x - parent.width
+                width: gridView.width - currentItemX - parent.width
                 height: parent.height
                 color: "#40404040"
             }
                 // top
             Rectangle {
                 x: 0
-                y: -gridView.currentItem.y
+                y: -currentItemY
                 width: parent.width
-                height: gridView.currentItem.y
+                height: currentItemY
                 color: "#40404040"
             }
                 // bottom
@@ -95,7 +94,7 @@ GamePageForm {
                 x: 0
                 y: parent.height
                 width: parent.width
-                height: gridView.height - gridView.currentItem.y - parent.height
+                height: gridView.height - currentItemY - parent.height
                 color: "#40404040"
             }
         }
@@ -126,23 +125,25 @@ GamePageForm {
 
             focus: true
             Keys.onPressed: {
-                if (cellLocked) return; // can't modify locked cells
-
-                var numPressed = -1;
-                // FIXME: probably should move this to SudokuGame
-                var maxNum = SudokuGame.size === 2 ? 4 : 9;
-
-                // Handle number key entry
-                // Key_0 = 0x30, Key_9 = 0x39, so we can just do some easy math here
-                if ((event.key >= Qt.Key_0) && (event.key <= Qt.Key_9)) {
-                    numPressed = event.key - Qt.Key_0;
+                if (event.key === Qt.Key_Escape) {
+                    gridView.currentIndex = -1;
                 }
-                //  TODO: A-F for size 4 games
 
-                // zero key clears the current guess, so it's valid
-                if (numPressed >= 0 && numPressed <= maxNum) {
-                    event.accepted = true;
-                    SudokuGame.setCellGuess(cellIndex, numPressed);
+                if (!cellLocked) { // can't modify locked cells
+                    var numPressed = -1;
+
+                    // Handle number key entry
+                    // Key_0 = 0x30, Key_9 = 0x39, so we can just do some easy math here
+                    if ((event.key >= Qt.Key_0) && (event.key <= Qt.Key_9)) {
+                        numPressed = event.key - Qt.Key_0;
+                    }
+                    //  TODO: A-F for size 4 games
+
+                    // zero key clears the current guess, so it's valid
+                    if (numPressed >= 0 && numPressed <= SudokuGame.rowSize) {
+                        event.accepted = true;
+                        SudokuGame.setCellGuess(cellIndex, numPressed);
+                    }
                 }
             }
 
@@ -174,15 +175,6 @@ GamePageForm {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 visible: (cellGuess !== 0) || cellLocked
-            }
-
-            Connections {
-                target: gridView
-                onCurrentIndexChanged: {
-                    if (gridView.currentIndex === cellIndex) {
-//                        console.log("Selected in GridView! " + cellIndex);
-                    }
-                }
             }
         }
     }

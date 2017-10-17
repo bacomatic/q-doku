@@ -40,7 +40,6 @@ QtObject {
     // random seed, 0 for random random seed
     property int randomSeed: 0
 
-    property bool inPlay: false
     property int size: 3
     readonly property int rowSize: {size * size}
     readonly property int cellCount: {rowSize * rowSize}
