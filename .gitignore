@@ -53,6 +53,7 @@ wrapper.sh
 /src/libs/qt-breakpad/bin
 app_version.h
 phony.c
+CMakeLists.txt.user
 
 # xemacs temporary files
 *.flc

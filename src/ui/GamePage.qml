@@ -26,6 +26,8 @@ import "qrc:/sudoku/"
 GamePageForm {
     id: root
 
+    signal gameOver();
+
     property int gridCellWidth: {
         gridView.width / SudokuGame.rowSize;
     }
@@ -44,9 +46,18 @@ GamePageForm {
 
     function reset() {
         gamePage.focus = true;
+        gridView.enabled = true;
         gamePage.gridView.focus = true;
         gamePage.gridView.currentIndex = -1;
         gamePage.gameDividers.refresh();
+    }
+
+    function endGame() {
+        // turn off mouse area, nav, etc so we can't interact with the board
+        gridView.focus = false;
+        gridView.currentIndex = -1;
+        gridView.enabled = false;
+        gameOver();
     }
 
     Component {
@@ -143,6 +154,9 @@ GamePageForm {
                     if (numPressed >= 0 && numPressed <= SudokuGame.rowSize) {
                         event.accepted = true;
                         SudokuGame.setCellGuess(cellIndex, numPressed);
+                        if (SudokuGame.gameOverMan()) {
+                            endGame();
+                        }
                     }
                 }
             }

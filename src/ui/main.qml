@@ -213,6 +213,11 @@ ApplicationWindow {
 
     GamePage {
         id: gamePage
+
+        onGameOver: {
+            inPlay = false;
+            // TODO: Do something interesting...
+        }
     }
 
     Component.onCompleted: {

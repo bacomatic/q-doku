@@ -24,6 +24,8 @@
 
 var puzzleReceivedCallback = null;
 
+// FIXME: Just roll this into SudokuGame? There isn't as much to it as I thought there would be.
+
 function postNewBoardRequest(size, seed) {
     var request = new XMLHttpRequest;
     // FIXME: change this when the puzzle API is done
@@ -34,8 +36,6 @@ function postNewBoardRequest(size, seed) {
 
     request.open("GET", reqURL, true, null, null);
     request.setRequestHeader("Accept-Type", "application/json");
-//    request.setRequestHeader("Connection", "close"); // Needed?
-
     request.onreadystatechange = function() {
         if (request.readyState === XMLHttpRequest.DONE) {
             if (request.status === 200) {
@@ -48,12 +48,16 @@ function postNewBoardRequest(size, seed) {
                     // got a puzzleId, wait for it to be generated
                     console.log("Puzzle being generated. Id = " + puzzleInfo.puzzleId);
                     // periodically poll until it's done.
+                    // TODO: server doesn't support this yet, so leave this blank for now
+                } else {
+                    console.log("ERROR: Got response from puzzle request but invalid puzzle?? Abandoning request.");
                 }
             } else {
                 console.log("Error: " + request.statusText);
             }
         }
     }
+    console.log("Sending puzzle request...");
     request.send();
 }
 

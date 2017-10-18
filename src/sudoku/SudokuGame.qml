@@ -203,11 +203,32 @@ QtObject {
                         console.log("Server ping successful.");
                     }
                 } else {
-                    console.log("Server ping returned status " + request.status + ": " + request.statusText);
+                    console.log("ERROR: Server ping returned status " + request.status + ": " + request.statusText);
                 }
             }
         };
         console.log("Sending server ping...");
         request.send();
+    }
+
+    // Check if the game is finished or not
+    function gameOverMan() {
+        for (var index = 0; index < boardModel.count; index++) {
+            var cell = boardModel.get(index);
+
+            // any un-guessed cell aborts
+            if (cell.cellGuess < 1) {
+                return false;
+            }
+
+            // any mis-matched cell aborts
+            if (cell.cellGuess != cell.cellValue) {
+                return false;
+            }
+
+            // TODO: We could track how many cells are incorrectly guessed and report the number, if all cells are guessed
+        }
+        console.log("Game over, man!");
+        return true;
     }
 }

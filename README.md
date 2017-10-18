@@ -10,13 +10,13 @@ TODO:
 	- [X] Remove demo puzzles
 	- [ ] Request real puzzles, not demo puzzles
 - [X] Add game board to GamePage
-- [ ] Add game logic
+- [X] Add game logic
 	- [X] Add mouse selection and cell highlighting
 	- [X] Add keyboard navigation
 	- [X] Add number entry
 	- [X] Add puzzle validation, error detection
 	- [X] Error/Warning highlighting
-	- [ ] Add game over logic
+	- [X] Add game over logic
 - [X] Hide main menu in a hamburger instead of goofy swipe view
 - [X] License headers...
 - [X] Better board grid generation
@@ -31,6 +31,14 @@ TODO:
 	- [ ] Guess error rate
 - [ ] SaaM (SudokuGame as a Model)
 - [ ] Board generator progress meter, if board/puzzle needs to be generated
+- [ ] Puzzle difficulty setting(s)
+- [ ] Click on number to highlight all other cells with the same number
+- [ ] Status bar (?)
+- [ ] Allow mouse-only interaction (== touch friendly!)
+
+Future enhancements:
+- [ ] Notes
+- [ ] Board/Puzzle browser, show/choose available puzzles on server
 
 Features requiring backend work:
 - [ ] Actual puzzle generation
@@ -40,4 +48,4 @@ Features requiring backend work:
 BUGS:
 - [ ] Left/right arrow navigation wraps around to prev/next row
 - [ ] Row/Col highlight bar doesn't animate shrinking when cell selection moves
-- [ ] Random seed dialog is uuuuuuugly
+- [ ] Random seed dialog is uuuuuuugly (should be in settings?)
