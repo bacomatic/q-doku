@@ -59,14 +59,17 @@ QtObject {
             size = newSize;
         }
         console.log("Generating board size = " + size + " cellCount = " + cellCount);
-        var gameBoard = BoardData.getBoard(size, randomSeed);
+        BoardData.getPuzzle(size, randomSeed, puzzleReceived);
+    }
 
+    function puzzleReceived(puzzleInfo) {
+        console.log("Puzzle received, we can start the game now...");
         boardModel.clear();
         boardModel.columnCount(rowSize);
         boardModel.rowCount(rowSize);
 
-        var board = gameBoard.board;
-        var puzzle = gameBoard.puzzle;
+        var board = puzzleInfo.board;
+        var puzzle = puzzleInfo.puzzle;
 
         // rebuild row, column, box lists
         while (rowList.pop() !== undefined) {}
@@ -185,5 +188,26 @@ QtObject {
         var boxY = Math.floor(rowForCell(index) / size);
         var boxX = Math.floor(columnForCell(index) / size);
         return boxX + boxY * size;
+    }
+
+    function pingPuzzleServer() {
+        var request = new XMLHttpRequest;
+        request.open("GET", "https://sudoku-serve.herokuapp.com/sudoku", true, null, null);
+        request.onreadystatechange = function() {
+            if (request.readyState === XMLHttpRequest.DONE) {
+                if (request.status === 200) {
+                    // verify the body text matches "Hello, Sudoku!"
+                    if (request.responseText !== "Hello, Sudoku!") {
+                        console.log("ERROR: Server ping returned an unexpected result! ("+request.responseText+")");
+                    } else {
+                        console.log("Server ping successful.");
+                    }
+                } else {
+                    console.log("Server ping returned status " + request.status + ": " + request.statusText);
+                }
+            }
+        };
+        console.log("Sending server ping...");
+        request.send();
     }
 }

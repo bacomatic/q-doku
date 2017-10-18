@@ -29,8 +29,6 @@ import "qrc:/sudoku/"
 ApplicationWindow {
     id: application
     visible: true
-    width: 640
-    height: 480
     title: qsTr("Q - Doku!")
     minimumHeight: 520
     maximumHeight: 520
@@ -215,5 +213,10 @@ ApplicationWindow {
 
     GamePage {
         id: gamePage
+    }
+
+    Component.onCompleted: {
+        // Ping the server so it's alive when we want to generate a new board
+        SudokuGame.pingPuzzleServer();
     }
 }

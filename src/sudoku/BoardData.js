@@ -22,61 +22,46 @@
 
 .pragma library
 
-var demoBoard = {
-    size: 3,
-    boardId: "ba7998da-f51d-490e-b461-341e3ce21ec1",
-    randomSeed: 0,
-    board: [
-        7,8,2, 5,4,6, 9,1,3,
-        6,4,3, 9,1,8, 7,5,2,
-        1,5,9, 3,7,2, 6,4,8,
+var puzzleReceivedCallback = null;
 
-        9,7,4, 6,2,1, 8,3,5,
-        5,1,6, 4,8,3, 2,7,9,
-        3,2,8, 7,9,5, 4,6,1,
+function postNewBoardRequest(size, seed) {
+    var request = new XMLHttpRequest;
+    // FIXME: change this when the puzzle API is done
+    var reqURL = "https://sudoku-serve.herokuapp.com/sudoku/puzzles/demo?size="+size;
+    if (seed != 0) {
+        reqURL += "&randomSeed="+seed;
+    }
 
-        8,6,7, 1,3,9, 5,2,4,
-        4,9,1, 2,5,7, 3,8,6,
-        2,3,5, 8,6,4, 1,9,7
-    ],
-    puzzle: [
-        0,0,0, 0,0,1, 1,1,0,
-        0,0,0, 1,0,0, 0,0,1,
-        0,1,0, 0,0,0, 1,0,0,
+    request.open("GET", reqURL, true, null, null);
+    request.setRequestHeader("Accept-Type", "application/json");
+//    request.setRequestHeader("Connection", "close"); // Needed?
 
-        0,0,1, 0,1,0, 0,0,1,
-        0,0,1, 0,0,1, 0,0,0,
-        0,0,1, 0,1,0, 1,0,0,
-
-        1,0,1, 0,1,0, 1,0,0,
-        1,0,1, 0,0,1, 0,1,0,
-        0,1,0, 1,0,0, 0,1,1
-    ],
-};
-
-var smallDemoBoard = {
-    size: 2,
-    boardId: "200e5b5c-f758-460d-a77b-a60b02355ebb",
-    randomSeed: 0,
-    board: [
-        1,3, 2,4,
-        4,2, 1,3,
-        3,1, 4,2,
-        2,4, 3,1
-    ],
-    puzzle: [
-        1,0, 0,1,
-        0,1, 1,0,
-
-        1,0, 0,1,
-        1,0, 1,0
-    ]
+    request.onreadystatechange = function() {
+        if (request.readyState === XMLHttpRequest.DONE) {
+            if (request.status === 200) {
+                console.log("Request response: " + request.responseText);
+                var puzzleInfo = JSON.parse(request.responseText);
+                if (puzzleInfo.puzzle && (puzzleInfo.puzzle.length > 0)) {
+                    console.log("Full puzzle received, starting game!");
+                    puzzleReceivedCallback(puzzleInfo);
+                } else if (puzzleInfo.puzzleId) {
+                    // got a puzzleId, wait for it to be generated
+                    console.log("Puzzle being generated. Id = " + puzzleInfo.puzzleId);
+                    // periodically poll until it's done.
+                }
+            } else {
+                console.log("Error: " + request.statusText);
+            }
+        }
+    }
+    request.send();
 }
 
-function getBoard(size, seed) {
-    // TODO: Request board/puzzle from server
-    if (size === 2) {
-        return smallDemoBoard;
-    }
-    return demoBoard;
+/*
+ * Request a Sudoku puzzle from the server.
+ */
+function getPuzzle(size, seed, callback) {
+    // Request puzzle from server
+    puzzleReceivedCallback = callback;
+    postNewBoardRequest(size, seed);
 }
