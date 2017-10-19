@@ -32,11 +32,13 @@ TODO:
 - [ ] SaaM (SudokuGame as a Model)
 - [ ] Board generator progress meter, if board/puzzle needs to be generated
 - [ ] Puzzle difficulty setting(s)
-- [ ] Click on number to highlight all other cells with the same number
+- [X] Click on number to highlight all other cells with the same number
 - [ ] Status bar (?)
-- [ ] Allow mouse-only interaction (== touch friendly!)
+- [X] Allow mouse-only interaction (== touch friendly!)
+- [ ] New game dialog
 
 Future enhancements:
+- [ ] Themes. Colors, image tiles, etc...
 - [ ] Notes
 - [ ] Board/Puzzle browser, show/choose available puzzles on server
 
@@ -49,3 +51,4 @@ BUGS:
 - [ ] Left/right arrow navigation wraps around to prev/next row
 - [ ] Row/Col highlight bar doesn't animate shrinking when cell selection moves
 - [ ] Random seed dialog is uuuuuuugly (should be in settings?)
+- [ ] Game board does not scale with window size, would be necessary for mobile devices

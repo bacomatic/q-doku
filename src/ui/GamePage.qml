@@ -28,6 +28,9 @@ GamePageForm {
 
     signal gameOver();
 
+    // The number we should highlight in the board
+    property int highlightNumber: 0
+
     property int gridCellWidth: {
         gridView.width / SudokuGame.rowSize;
     }
@@ -44,20 +47,42 @@ GamePageForm {
         SudokuGame.columnForCell(gridView.currentIndex);
     }
 
-    function reset() {
-        gamePage.focus = true;
-        gridView.enabled = true;
+    readonly property int currentCellGuess: {
+        if (gridView.currentIndex === -1) {
+            return -1;
+        }
+        return SudokuGame.boardModel.get(gridView.currentIndex).cellGuess;
+    }
+
+    function takeFocus() {
+        focus = true;
         gamePage.gridView.focus = true;
+    }
+
+    function reset() {
+        gridView.enabled = true;
+        takeFocus();
         gamePage.gridView.currentIndex = -1;
+        highlightNumber = 0;
         gamePage.gameDividers.refresh();
     }
 
     function endGame() {
-        // turn off mouse area, nav, etc so we can't interact with the board
-        gridView.focus = false;
         gridView.currentIndex = -1;
+        highlightNumber = -1;
         gridView.enabled = false;
         gameOver();
+    }
+
+    function setCellGuess(index, guess) {
+        SudokuGame.setCellGuess(index, guess);
+        // Highlight number if not clearing
+        if (guess > 0) {
+            highlightNumber = guess;
+        }
+        if (SudokuGame.gameOverMan()) {
+            endGame();
+        }
     }
 
     Component {
@@ -82,7 +107,7 @@ GamePageForm {
                 y: 0
                 width: currentItemX
                 height: parent.height
-                color: "#40404040"
+                color: "#20808010"
             }
                 // left
             Rectangle {
@@ -90,7 +115,7 @@ GamePageForm {
                 y: 0
                 width: gridView.width - currentItemX - parent.width
                 height: parent.height
-                color: "#40404040"
+                color: "#20808010"
             }
                 // top
             Rectangle {
@@ -98,7 +123,7 @@ GamePageForm {
                 y: -currentItemY
                 width: parent.width
                 height: currentItemY
-                color: "#40404040"
+                color: "#20808010"
             }
                 // bottom
             Rectangle {
@@ -106,7 +131,43 @@ GamePageForm {
                 y: parent.height
                 width: parent.width
                 height: gridView.height - currentItemY - parent.height
-                color: "#40404040"
+                color: "#20808010"
+            }
+        }
+    }
+
+    Component {
+        id: numberButtonDelegate
+        Item {
+            width: 40
+            height: 40
+
+            Rectangle {
+                width: 40
+                height: 40
+                color: currentCellGuess === index+1
+                        ? "grey"
+                        : "lightgrey";
+            }
+
+            MouseArea {
+                width: 40
+                height: 40
+                enabled: gridView.currentIndex != -1
+
+                onClicked: {
+                    if (gridView.currentIndex != -1) {
+                        setCellGuess(gridView.currentIndex, index+1);
+                    }
+                }
+            }
+
+            Text {
+                text: index+1
+                font.bold: true
+                font.pointSize: 16
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
             }
         }
     }
@@ -134,10 +195,21 @@ GamePageForm {
             width: gridCellWidth
             height: gridCellHeight
 
+            property color numberColor: {
+                if (cellError && SudokuGame.showCellErrors) {
+                    return "red";
+                } else if (SudokuGame.highlightLikeNumbers &&
+                           cellGuess > 0 && highlightNumber === cellGuess) {
+                    return "blue";
+                }
+                return "black";
+            }
+
             focus: true
             Keys.onPressed: {
                 if (event.key === Qt.Key_Escape) {
                     gridView.currentIndex = -1;
+                    highlightNumber = 0;
                 }
 
                 if (!cellLocked) { // can't modify locked cells
@@ -153,10 +225,7 @@ GamePageForm {
                     // zero key clears the current guess, so it's valid
                     if (numPressed >= 0 && numPressed <= SudokuGame.rowSize) {
                         event.accepted = true;
-                        SudokuGame.setCellGuess(cellIndex, numPressed);
-                        if (SudokuGame.gameOverMan()) {
-                            endGame();
-                        }
+                        setCellGuess(gridView.currentIndex, numPressed);
                     }
                 }
             }
@@ -166,7 +235,14 @@ GamePageForm {
                 anchors.fill: parent
 
                 onClicked: {
+                    // make sure GridView has active focus when
+                    // we click on it, otherwise subsequent key
+                    // presses won't work
+                    takeFocus();
                     gridView.currentIndex = cellIndex;
+                    if (cellGuess != 0) {
+                        highlightNumber = cellGuess;
+                    }
                 }
             }
 
@@ -185,7 +261,7 @@ GamePageForm {
                 text: cellGuess
                 font.family: "Helvetica"
                 font.pointSize: 24
-                color: cellError ? "red" : "black"
+                color: numberColor
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 visible: (cellGuess !== 0) || cellLocked

@@ -62,4 +62,16 @@ Item {
             z: 1
         }
     }
+
+    ListView {
+        id: numberButtons
+        x: 26
+        y: 20
+        width: 40
+        height: 432
+        spacing: 9
+        clip: true
+        model: SudokuGame.rowSize
+        delegate: numberButtonDelegate
+    }
 }

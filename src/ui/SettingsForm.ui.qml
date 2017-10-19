@@ -11,17 +11,6 @@ Item {
         anchors.fill: parent
     }
 
-    RadioButton {
-        id: radioButton
-        x: 8
-        y: 291
-        width: 384
-        height: 40
-        text: qsTr("Show Errors")
-        font.pointSize: 16
-        checked: true
-    }
-
     GroupBox {
         id: groupBox
         x: 8
@@ -83,5 +72,37 @@ Item {
     Connections {
         target: sizeRandom
         onClicked: SudokuGame.newSize = 0
+    }
+
+    CheckBox {
+        id: checkBox
+        x: 8
+        y: 248
+        width: 384
+        height: 40
+        text: qsTr("Show Errors")
+        checked: SudokuGame.showCellErrors
+        font.pointSize: 16
+    }
+
+    CheckBox {
+        id: checkBox1
+        x: 8
+        y: 294
+        width: 384
+        height: 40
+        text: qsTr("Highlight Like Numbers")
+        checked: SudokuGame.highlightLikeNumbers
+        font.pointSize: 16
+    }
+
+    Connections {
+        target: checkBox
+        onClicked: SudokuGame.showCellErrors = !SudokuGame.showCellErrors
+    }
+
+    Connections {
+        target: checkBox1
+        onClicked: SudokuGame.highlightLikeNumbers = !SudokuGame.highlightLikeNumbers
     }
 }

@@ -30,12 +30,18 @@ ApplicationWindow {
     id: application
     visible: true
     title: qsTr("Q - Doku!")
+
+    // FIXME: make resizable and more mobile-friendly
     minimumHeight: 520
     maximumHeight: 520
     minimumWidth: 640
     maximumWidth: 640
 
     property bool inPlay: false
+
+//    onActiveFocusItemChanged: {
+//        console.log("Active focus: " + activeFocusItem);
+//    }
 
     Shortcut {
         sequence: StandardKey.New
@@ -55,6 +61,7 @@ ApplicationWindow {
             ToolButton {
                 id: hamburgerButton
                 text: "\u2630"
+
                 contentItem: Text {
                     text: parent.text
                     font.pointSize: 16
@@ -95,6 +102,7 @@ ApplicationWindow {
             ToolButton {
                 id: settingsButton
                 text: "\u2699"
+
                 contentItem: Text {
                     text: parent.text
                     font.pointSize: 16
@@ -102,9 +110,8 @@ ApplicationWindow {
                 }
 
                 onClicked: {
-                    console.log("Settings!");
                     if (settingsDrawer.visible) {
-                        settingsDrawer.close()
+                        settingsDrawer.close();
                     } else {
                         settingsDrawer.open();
                     }
@@ -177,12 +184,14 @@ ApplicationWindow {
             // Reset for the next game
             textField.text = "0";
             SudokuGame.randomSeed = 0;
+            gamePage.takeFocus();
         }
 
         onRejected: {
             textField.text = "0";
             SudokuGame.randomSeed = 0;
             requestRandomSeed.close()
+            gamePage.takeFocus();
         }
     }
 
@@ -208,6 +217,10 @@ ApplicationWindow {
         height: application.height
         Settings {
             id: settingsForm
+        }
+
+        onClosed: {
+            gamePage.takeFocus()
         }
     }
 

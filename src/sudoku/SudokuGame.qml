@@ -34,12 +34,19 @@ import "BoardData.js" as BoardData
  */
 
 QtObject {
-    // New game settings, will not take effect until newBoard is called
-    // new board size, 0 = random size, otherwise explicit size
-    property int newSize: 3
-    // random seed, 0 for random random seed
-    property int randomSeed: 0
+    // Settings as shown in the settings drawer
+    // FIXME: This is a bad place to put these, find a better place
 
+        // new board size, 0 = random size, otherwise explicit size
+    property int newSize: 3
+        // random seed, 0 for random random seed
+    property int randomSeed: 0
+        // turn cell number red if it detects a conflict with another row/col/box
+    property bool showCellErrors: true
+        // turn numbers of all cells with the same number blue
+    property bool highlightLikeNumbers: true
+
+    // Actual board/puzzle properties
     property int size: 3
     readonly property int rowSize: {size * size}
     readonly property int cellCount: {rowSize * rowSize}
@@ -115,6 +122,11 @@ QtObject {
             console.log("Error: cell index out of bounds: " + index);
             return;
         }
+        // first check if it's locked, reject if so
+        if (boardModel.get(index).cellLocked) {
+            return;
+        }
+
         if (guess < 0 || guess > rowSize) {
             console.log("Error: guess value out of bounds: " + guess);
             return;
