@@ -58,6 +58,9 @@ QtObject {
     readonly property var columnList: []
     readonly property var boxList: []
 
+    property bool requestInProgress: false
+    // TODO: puzzle generator progress, when implemented in the server
+
     function newBoard() {
         // reset game state
         if (newSize === 0) {
@@ -66,6 +69,7 @@ QtObject {
             size = newSize;
         }
         console.log("Generating board size = " + size + " cellCount = " + cellCount);
+        requestInProgress = true;
         BoardData.getPuzzle(size, randomSeed, puzzleReceived);
     }
 
@@ -115,6 +119,8 @@ QtObject {
             columnList[newCell.cellColumn].push(index);
             boxList[newCell.cellBox].push(index);
         }
+
+        requestInProgress = false;
     }
 
     function setCellGuess(index, guess) {

@@ -30,7 +30,9 @@ TODO:
 	- [ ] Correct guesses made
 	- [ ] Guess error rate
 - [ ] SaaM (SudokuGame as a Model)
-- [ ] Board generator progress meter, if board/puzzle needs to be generated
+- [ ] Puzzle request status box
+	- [X] Busy indicator while requesting puzzle
+	- [ ] Board generator progress meter, if board/puzzle needs to be generated (TBD)
 - [ ] Puzzle difficulty setting(s)
 - [X] Click on number to highlight all other cells with the same number
 - [ ] Status bar (?)
@@ -44,6 +46,7 @@ Future enhancements:
 
 Features requiring backend work:
 - [ ] Actual puzzle generation
+- [ ] Puzzle generator progress
 - [ ] Selectable puzzle difficulties
 - [ ] Different configurations, e.g., Samurai boards
 

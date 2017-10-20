@@ -74,4 +74,34 @@ Item {
         model: SudokuGame.rowSize
         delegate: numberButtonDelegate
     }
+
+    Rectangle {
+        id: busyBox
+        x: 156
+        y: 165
+        width: 328
+        height: 150
+        color: "#ffffff"
+        visible: SudokuGame.requestInProgress
+
+        BusyIndicator {
+            id: busyIndicator
+            x: 134
+            y: 73
+            running: true
+            z: 1
+        }
+
+        Text {
+            id: text1
+            x: 8
+            y: 8
+            width: 312
+            height: 59
+            text: qsTr("Requesting puzzle from server...")
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            font.pointSize: 16
+        }
+    }
 }
