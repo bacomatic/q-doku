@@ -91,9 +91,6 @@ GamePageForm {
             // x, y, width and height will be set to the current item coordinates and size
             z: 1
 
-            property int currentItemX: gridView.currentItem ? gridView.currentItem.x : 0
-            property int currentItemY: gridView.currentItem ? gridView.currentItem.y : 0
-
             Rectangle {
                 anchors.fill: parent
                 color: "#400020FF"
@@ -101,28 +98,28 @@ GamePageForm {
 
             // NOTE: coordinates here are relative to parent!
             // Row highlighter
-                // right
+                // left
             Rectangle {
-                x: -currentItemX
+                x: -parent.x
                 y: 0
-                width: currentItemX
+                width: parent.x
                 height: parent.height
                 color: "#20808010"
             }
-                // left
+                // right
             Rectangle {
                 x: parent.width
                 y: 0
-                width: gridView.width - currentItemX - parent.width
+                width: gridView.width - parent.x - parent.width
                 height: parent.height
                 color: "#20808010"
             }
                 // top
             Rectangle {
                 x: 0
-                y: -currentItemY
+                y: -parent.y
                 width: parent.width
-                height: currentItemY
+                height: parent.y
                 color: "#20808010"
             }
                 // bottom
@@ -130,7 +127,7 @@ GamePageForm {
                 x: 0
                 y: parent.height
                 width: parent.width
-                height: gridView.height - currentItemY - parent.height
+                height: gridView.height - parent.y - parent.height
                 color: "#20808010"
             }
         }
@@ -207,25 +204,42 @@ GamePageForm {
 
             focus: true
             Keys.onPressed: {
-                if (event.key === Qt.Key_Escape) {
+                switch (event.key) {
+                case Qt.Key_Escape:
                     gridView.currentIndex = -1;
                     highlightNumber = 0;
-                }
+                    event.accepted = true;
+                    break;
 
-                if (!cellLocked) { // can't modify locked cells
-                    var numPressed = -1;
-
-                    // Handle number key entry
-                    // Key_0 = 0x30, Key_9 = 0x39, so we can just do some easy math here
-                    if ((event.key >= Qt.Key_0) && (event.key <= Qt.Key_9)) {
-                        numPressed = event.key - Qt.Key_0;
-                    }
-                    //  TODO: A-F for size 4 games
-
-                    // zero key clears the current guess, so it's valid
-                    if (numPressed >= 0 && numPressed <= SudokuGame.rowSize) {
+                case Qt.Key_Left:
+                    // prevent wrap to previous row
+                    if (cellColumn === 0) {
                         event.accepted = true;
-                        setCellGuess(gridView.currentIndex, numPressed);
+                    }
+                    break;
+
+                case Qt.Key_Right:
+                    // prevent wrap to next row
+                    if (cellColumn === SudokuGame.rowSize-1) {
+                        event.accepted = true;
+                    }
+                    break;
+                default:
+                    if (!cellLocked) { // can't modify locked cells
+                        var numPressed = -1;
+
+                        // Handle number key entry
+                        // Key_0 = 0x30, Key_9 = 0x39, so we can just do some easy math here
+                        if ((event.key >= Qt.Key_0) && (event.key <= Qt.Key_9)) {
+                            numPressed = event.key - Qt.Key_0;
+                        }
+                        //  TODO: A-F for size 4 games
+
+                        // zero key clears the current guess, so it's valid
+                        if (numPressed >= 0 && numPressed <= SudokuGame.rowSize) {
+                            event.accepted = true;
+                            setCellGuess(gridView.currentIndex, numPressed);
+                        }
                     }
                 }
             }

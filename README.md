@@ -29,7 +29,7 @@ TODO:
 	- [ ] Guesses made
 	- [ ] Correct guesses made
 	- [ ] Guess error rate
-- [ ] SaaM (SudokuGame as a Model)
+- [ ] SaaM (SudokuGame as a Model, sadly no TableModel in QML)
 - [ ] Puzzle request status box
 	- [X] Busy indicator while requesting puzzle
 	- [ ] Board generator progress meter, if board/puzzle needs to be generated (TBD)
@@ -38,6 +38,8 @@ TODO:
 - [ ] Status bar (?)
 - [X] Allow mouse-only interaction (== touch friendly!)
 - [ ] New game dialog
+- [ ] Add some graphics, so it actually looks nice (background, cell tiles, etc..)
+- [ ] Add some sound effects
 
 Future enhancements:
 - [ ] Themes. Colors, image tiles, etc...
@@ -51,7 +53,7 @@ Features requiring backend work:
 - [ ] Different configurations, e.g., Samurai boards
 
 BUGS:
-- [ ] Left/right arrow navigation wraps around to prev/next row
-- [ ] Row/Col highlight bar doesn't animate shrinking when cell selection moves
-- [ ] Random seed dialog is uuuuuuugly (should be in settings?)
+- [X] Left/right arrow navigation wraps around to prev/next row
+- [X] Row/Col highlight bar doesn't animate shrinking when cell selection moves
+- [ ] Random seed dialog is uuuuuuugly (should be in New Game dialog)
 - [ ] Game board does not scale with window size, would be necessary for mobile devices

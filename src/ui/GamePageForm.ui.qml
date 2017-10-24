@@ -81,7 +81,9 @@ Item {
         y: 165
         width: 328
         height: 150
-        color: "#ffffff"
+        color: "#ffffc9"
+        radius: 10
+        border.width: 2
         visible: SudokuGame.requestInProgress
 
         BusyIndicator {
