@@ -25,7 +25,7 @@ Item {
             x: 0
             y: 0
             text: qsTr("2x2")
-            checked: SudokuGame.newSize === 2
+            checked: application.gameSettings.boardSize === 2
         }
 
         CheckBox {
@@ -33,7 +33,7 @@ Item {
             x: 0
             y: 46
             text: qsTr("3x3")
-            checked: SudokuGame.newSize === 3
+            checked: application.gameSettings.boardSize === 3
         }
 
         CheckBox {
@@ -41,7 +41,7 @@ Item {
             x: 0
             y: 138
             text: qsTr("Random")
-            checked: SudokuGame.newSize === 0
+            checked: application.gameSettings.boardSize === 0
         }
 
         CheckBox {
@@ -49,29 +49,29 @@ Item {
             x: 0
             y: 92
             text: qsTr("4x4")
-            checked: SudokuGame.newSize === 4
+            checked: application.gameSettings.boardSize === 4
             enabled: false
         }
     }
 
     Connections {
         target: size2x2
-        onClicked: SudokuGame.newSize = 2
+        onClicked: application.gameSettings.boardSize = 2
     }
 
     Connections {
         target: size3x3
-        onClicked: SudokuGame.newSize = 3
+        onClicked: application.gameSettings.boardSize = 3
     }
 
     Connections {
         target: size4x4
-        onClicked: SudokuGame.newSize = 4
+        onClicked: application.gameSettings.boardSize = 4
     }
 
     Connections {
         target: sizeRandom
-        onClicked: SudokuGame.newSize = 0
+        onClicked: application.gameSettings.boardSize = 0
     }
 
     CheckBox {
@@ -81,7 +81,7 @@ Item {
         width: 384
         height: 40
         text: qsTr("Show Errors")
-        checked: SudokuGame.showCellErrors
+        checked: application.gameSettings.showCellErrors
         font.pointSize: 16
     }
 
@@ -92,17 +92,17 @@ Item {
         width: 384
         height: 40
         text: qsTr("Highlight Like Numbers")
-        checked: SudokuGame.highlightLikeNumbers
+        checked: application.gameSettings.highlightLikeNumbers
         font.pointSize: 16
     }
 
     Connections {
         target: checkBox
-        onClicked: SudokuGame.showCellErrors = !SudokuGame.showCellErrors
+        onClicked: application.gameSettings.showCellErrors = !application.gameSettings.showCellErrors
     }
 
     Connections {
         target: checkBox1
-        onClicked: SudokuGame.highlightLikeNumbers = !SudokuGame.highlightLikeNumbers
+        onClicked: application.gameSettings.highlightLikeNumbers = !application.gameSettings.highlightLikeNumbers
     }
 }

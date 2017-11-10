@@ -7,6 +7,7 @@
         <file>ui/GameDividers.qml</file>
         <file>ui/Settings.qml</file>
         <file>ui/SettingsForm.ui.qml</file>
+        <file>ui/GameSettings.qml</file>
     </qresource>
     <qresource prefix="/sudoku">
         <file alias="SudokuGame.qml">sudoku/SudokuGame.qml</file>

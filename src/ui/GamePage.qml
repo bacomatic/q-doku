@@ -21,6 +21,8 @@
  */
 
 import QtQuick 2.7
+import QtQuick.Controls 2.2
+
 import "qrc:/sudoku/"
 
 GamePageForm {
@@ -136,35 +138,21 @@ GamePageForm {
     Component {
         id: numberButtonDelegate
         Item {
-            width: 40
+            width: parent.width
             height: 40
 
-            Rectangle {
-                width: 40
-                height: 40
-                color: currentCellGuess === index+1
-                        ? "grey"
-                        : "lightgrey";
-            }
+            Button {
+                anchors.fill: parent
 
-            MouseArea {
-                width: 40
-                height: 40
-                enabled: gridView.currentIndex != -1
-
-                onClicked: {
-                    if (gridView.currentIndex != -1) {
-                        setCellGuess(gridView.currentIndex, index+1);
-                    }
-                }
-            }
-
-            Text {
                 text: index+1
                 font.bold: true
                 font.pointSize: 16
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
+
+                enabled: gridView.currentItem != null && !gridView.currentItem.cellLocked
+
+                onClicked: {
+                    setCellGuess(gridView.currentIndex, index+1)
+                }
             }
         }
     }
@@ -193,9 +181,9 @@ GamePageForm {
             height: gridCellHeight
 
             property color numberColor: {
-                if (cellError && SudokuGame.showCellErrors) {
+                if (cellError && application.gameSettings.showCellErrors) {
                     return "red";
-                } else if (SudokuGame.highlightLikeNumbers &&
+                } else if (application.gameSettings.highlightLikeNumbers &&
                            cellGuess > 0 && highlightNumber === cellGuess) {
                     return "blue";
                 }

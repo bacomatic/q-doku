@@ -25,12 +25,18 @@
 #include <QFile>
 #include <QIODevice>
 
+#include <QDebug>
+
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
+
+    // FIXME: For debugging, remove for production
+    qInfo() << engine.offlineStorageDatabaseFilePath("Q-Doku") << "\n";
+
     engine.addImportPath("qrc:/sudoku");
     engine.load(QUrl(QLatin1String("qrc:/ui/main.qml")));
     if (engine.rootObjects().isEmpty())

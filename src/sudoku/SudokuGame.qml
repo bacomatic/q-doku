@@ -34,18 +34,6 @@ import "BoardData.js" as BoardData
  */
 
 QtObject {
-    // Settings as shown in the settings drawer
-    // FIXME: This is a bad place to put these, find a better place
-
-        // new board size, 0 = random size, otherwise explicit size
-    property int newSize: 3
-        // random seed, 0 for random random seed
-    property int randomSeed: 0
-        // turn cell number red if it detects a conflict with another row/col/box
-    property bool showCellErrors: true
-        // turn numbers of all cells with the same number blue
-    property bool highlightLikeNumbers: true
-
     // Actual board/puzzle properties
     property int size: 3
     readonly property int rowSize: {size * size}
@@ -61,7 +49,7 @@ QtObject {
     property bool requestInProgress: false
     // TODO: puzzle generator progress, when implemented in the server
 
-    function newBoard() {
+    function newBoard(newSize, randomSeed) {
         // reset game state
         if (newSize === 0) {
             size = Math.floor(Math.random() * 2) + 2; // should choose 2-3 inclusively

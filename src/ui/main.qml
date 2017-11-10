@@ -38,6 +38,7 @@ ApplicationWindow {
     maximumWidth: 640
 
     property bool inPlay: false
+    property GameSettings gameSettings: settings
 
 //    onActiveFocusItemChanged: {
 //        console.log("Active focus: " + activeFocusItem);
@@ -201,13 +202,18 @@ ApplicationWindow {
             newGameAlert.open();
         } else {
             inPlay = true;
-            SudokuGame.newBoard();
+            SudokuGame.newBoard(settings.boardSize, settings.randomSeed);
             gamePage.reset();
         }
     }
 
     function reqRandomSeed() {
         requestRandomSeed.open()
+    }
+
+    // Game settings
+    GameSettings {
+        id: settings
     }
 
     // Settings drawer
@@ -234,6 +240,16 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
+        // test the settings interface
+        var version = settings.getNamedSetting("version");
+        console.log("version returned: "+version);
+        if (version) {
+            console.log("version is "+version);
+        } else {
+            version = "0.1a1";
+            settings.setNamedSetting("version", version);
+        }
+
         // Ping the server so it's alive when we want to generate a new board
         SudokuGame.pingPuzzleServer();
     }

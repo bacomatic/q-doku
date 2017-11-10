@@ -40,11 +40,18 @@ TODO:
 - [ ] New game dialog
 - [ ] Add some graphics, so it actually looks nice (background, cell tiles, etc..)
 - [ ] Add some sound effects
+- [ ] Use QML StateMachine to handle game state
+- [ ] Local storage handler (QML)
+	- [x] LocalStorage wrapper with basic settings
+	- [ ] Save/restore window size, needs resizability first
+	- [ ] Save current game
+	- [ ] Fetch/save unplayed boards (pre-loaded boards)
 
 Future enhancements:
 - [ ] Themes. Colors, image tiles, etc...
 - [ ] Notes
 - [ ] Board/Puzzle browser, show/choose available puzzles on server
+- [ ] Cloud storage (device dependent, e.g., iCloud for iOS)
 
 Features requiring backend work:
 - [ ] Actual puzzle generation
