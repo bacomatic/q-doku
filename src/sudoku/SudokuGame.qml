@@ -49,6 +49,73 @@ QtObject {
     property bool requestInProgress: false
     // TODO: puzzle generator progress, when implemented in the server
 
+    // Save/restore feature
+    // Game data is passed as an object, this will be serialized (to JSON) by GameSettings
+    function saveGame() {
+        if (requestInProgress || boardModel.count === 0) {
+            return null; // no game in progress
+        }
+
+        var gameData = {};
+
+        // game settings
+        gameData.size = size;
+        gameData.board = [];
+        gameData.puzzle = [];
+        gameData.guesses = [];
+
+        for (var index = 0; index < boardModel.count; index++) {
+            /*
+             * Fields in boardModel entries that we need:
+             * cellValue -> store
+             * cellLocked -> store (convert to int)
+             * cellGuess -> store
+             *
+             * all other values are calculated
+             */
+            var cell = boardModel.get(index);
+            gameData.board[index] = cell.cellValue;
+            gameData.puzzle[index] = cell.cellLocked;
+            gameData.guesses[index] = cell.cellGuess;
+        }
+
+        return gameData;
+    }
+
+    function restoreGame(gameData) {
+        if (!gameData || !gameData.size
+                || !gameData.board || !gameData.board.length
+                || !gameData.puzzle || !gameData.puzzle.length
+                || !gameData.guesses || !gameData.guesses.length) {
+            console.log("Saved game data is corrupt, rejecting.");
+            return false;
+        }
+
+        // validate size and ensure gameData.cells contains enough cells
+        var newSize = gameData.size;
+        if (newSize !== 2 && newSize !== 3 && newSize !== 4) {
+            console.log("Saved game size is not valid.");
+            return false;
+        }
+
+        size = newSize;
+
+        if (gameData.board.length !== cellCount
+                || gameData.puzzle.length !== cellCount
+                || gameData.guesses.length !== cellCount) {
+            console.log("Saved game data array(s) do not match expected size");
+            return false;
+        }
+
+        // now restore
+        puzzleReceived(gameData);
+        validatePuzzle(); // redo cellError fields
+
+        // assume success by this point, but just in case for some odd reason we've
+        // saved a finished game, run the game over logic
+        return !gameOverMan();
+    }
+
     function newBoard(newSize, randomSeed) {
         // reset game state
         if (newSize === 0) {
@@ -61,30 +128,49 @@ QtObject {
         BoardData.getPuzzle(size, randomSeed, puzzleReceived);
     }
 
+    /*
+     * puzzleInfo should have the following properties:
+     * size -> board size (optional)
+     * board -> array of cell values
+     * puzzle -> array of boolean locked values that comprise the actual puzzle
+     * guesses -> array of user-guessed values (optional, when restoring from saved game)
+     */
     function puzzleReceived(puzzleInfo) {
         console.log("Puzzle received, we can start the game now...");
+        if (puzzleInfo.size !== undefined) {
+            size = puzzleInfo.size;
+        }
+
         boardModel.clear();
         boardModel.columnCount(rowSize);
         boardModel.rowCount(rowSize);
 
         var board = puzzleInfo.board;
-        var puzzle = puzzleInfo.puzzle;
+        var puzzle = puzzleInfo.puzzle; // locked flags
+        var guesses = puzzleInfo.hasOwnProperty("guesses") ? puzzleInfo.guesses : null;
 
-        // rebuild row, column, box lists
+        var index;
+
+        // clear the row/col/box arrays
         while (rowList.pop() !== undefined) {}
         while (columnList.pop() !== undefined) {}
         while (boxList.pop() !== undefined) {}
 
         // initialize each with empty arrays
-        for (var index = 0; index < rowSize; index++) {
+        for (index = 0; index < rowSize; index++) {
             rowList[index] = [];
             columnList[index] = [];
             boxList[index] = [];
         }
 
-        for (var index = 0; index < cellCount; index++) {
-            var locked = puzzle[index] === 1;
-            var guess = locked ? board[index] : 0;
+        for (index = 0; index < cellCount; index++) {
+            var locked = puzzle[index] == true; // allow type coersion here, can be bool or int
+            var guess = 0;
+            if (guesses) {
+                guess = guesses[index];
+            } else if (locked) {
+                guess = board[index];
+            }
 
             var newCell = {
                 // board layout
@@ -150,14 +236,15 @@ QtObject {
 
     // Validate the entire puzzle board
     function validatePuzzle() {
+        var index;
         // clear error flags
-        for (var index = 0; index < boardModel.count; index++) {
+        for (index = 0; index < boardModel.count; index++) {
             boardModel.get(index).cellError = false;
         }
 
         // for each entry in boardModel
         // FIXME: Can be optimized...
-        for (var index = 0; index < boardModel.count; index++) {
+        for (index = 0; index < boardModel.count; index++) {
             var cell = boardModel.get(index);
             // if already has error or has no guessed value, just skip it
             if (cell.cellError || cell.cellGuess < 1) continue;

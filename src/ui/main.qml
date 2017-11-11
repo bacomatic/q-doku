@@ -252,5 +252,22 @@ ApplicationWindow {
 
         // Ping the server so it's alive when we want to generate a new board
         SudokuGame.pingPuzzleServer();
+
+        // Restore game if one was in progress
+        var gameData = settings.getNamedSetting("SavedGame");
+        if (gameData) {
+            inPlay = SudokuGame.restoreGame(gameData);
+        }
+    }
+
+    Component.onDestruction: {
+        // if a game is in progress, save it
+        if (inPlay) {
+            var gameData = SudokuGame.saveGame();
+            settings.setNamedSetting("SavedGame", gameData);
+        } else {
+            // make sure no game is saved
+            settings.setNamedSetting("SavedGame", null);
+        }
     }
 }

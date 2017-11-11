@@ -44,7 +44,7 @@ TODO:
 - [ ] Local storage handler (QML)
 	- [x] LocalStorage wrapper with basic settings
 	- [ ] Save/restore window size, needs resizability first
-	- [ ] Save current game
+	- [X] Save current game
 	- [ ] Fetch/save unplayed boards (pre-loaded boards)
 
 Future enhancements:
