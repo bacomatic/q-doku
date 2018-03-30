@@ -31,6 +31,7 @@ import "BoardData.js" as BoardData
  *
  * FIXME: Can't do this as a singleton if we implement more complex games, like Samurai
  *        (five boards overlayed). But this works for now
+ * FIXME: Use a loader instead of singleton.
  */
 
 QtObject {
@@ -315,7 +316,7 @@ QtObject {
             }
 
             // any mis-matched cell aborts
-            if (cell.cellGuess != cell.cellValue) {
+            if (cell.cellGuess !== cell.cellValue) {
                 return false;
             }
 

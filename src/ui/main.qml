@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, David DeHaven, All Rights Reserved.
+ * Copyright (c) 2017, 2018, David DeHaven, All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -41,7 +41,7 @@ ApplicationWindow {
     property GameSettings gameSettings: settings
 
 //    onActiveFocusItemChanged: {
-//        console.log("Active focus: " + activeFocusItem);
+//        console.log("Active focus: " + activeFocusItem)
 //    }
 
     Shortcut {
@@ -79,7 +79,7 @@ ApplicationWindow {
                     }
 
                     MenuItem {
-                        text: qsTr("New Game with Random Seed");
+                        text: qsTr("New Game with Random Seed")
                         onClicked: reqRandomSeed()
                     }
 
@@ -112,9 +112,9 @@ ApplicationWindow {
 
                 onClicked: {
                     if (settingsDrawer.visible) {
-                        settingsDrawer.close();
+                        closeSettings()
                     } else {
-                        settingsDrawer.open();
+                        openSettings()
                     }
                 }
             }
@@ -122,21 +122,25 @@ ApplicationWindow {
     }
 
     MessageDialog {
+        property bool dirtyBoardText: false
         id: newGameAlert
         icon: StandardIcon.Warning
         title: "Game in Progress!"
-        text: "Starting a new game will abandon the game in progress."
+        text: dirtyBoardText ?
+                  "You have changed the board settings, would you like to start a new game? This will abandon the game in progress."
+                : "Starting a new game will abandon the game in progress."
         informativeText: "Are you sure you want to do this?"
         standardButtons: StandardButton.Yes | StandardButton.No
 
         onYes: {
-            newGameAlert.close();
+            newGameAlert.close()
 
-            inPlay = false;
-            application.startNewGame();
+            inPlay = false
+            application.startNewGame()
         }
+
         onNo: {
-            newGameAlert.close();
+            newGameAlert.close()
         }
     }
 
@@ -176,40 +180,56 @@ ApplicationWindow {
 
         onAccepted: {
             requestRandomSeed.close()
-            inPlay = false;
+            inPlay = false
 
             // Generate new game with given random seed
-            SudokuGame.randomSeed = Number(textField.text);
-            startNewGame();
+            SudokuGame.randomSeed = Number(textField.text)
+            startNewGame()
 
             // Reset for the next game
-            textField.text = "0";
-            SudokuGame.randomSeed = 0;
-            gamePage.takeFocus();
+            textField.text = "0"
+            SudokuGame.randomSeed = 0
+            gamePage.takeFocus()
         }
 
         onRejected: {
-            textField.text = "0";
-            SudokuGame.randomSeed = 0;
+            textField.text = "0"
+            SudokuGame.randomSeed = 0
             requestRandomSeed.close()
-            gamePage.takeFocus();
+            gamePage.takeFocus()
         }
     }
 
-    function startNewGame() {
+    function startNewGame(dirty) {
         if (inPlay) {
             // Pop up an alert asking to abandon the current game
-            newGameAlert.open();
+            if (dirty === undefined) {
+                dirty = false
+            }
+            newGameAlert.dirtyBoardText = dirty
+            newGameAlert.open()
         } else {
-            inPlay = true;
-            SudokuGame.newBoard(settings.boardSize, settings.randomSeed);
-            gamePage.reset();
+            inPlay = true
+            SudokuGame.newBoard(settings.boardSize, settings.randomSeed)
+            gamePage.reset()
         }
     }
 
     function reqRandomSeed() {
         requestRandomSeed.open()
     }
+
+    function openSettings() {
+        if (!settingsDrawer.visible) {
+            settingsDrawer.open()
+        }
+    }
+
+   function closeSettings() {
+       if (settingsDrawer.visible) {
+           settingsDrawer.close()
+       }
+   }
 
     // Game settings
     GameSettings {
@@ -226,6 +246,12 @@ ApplicationWindow {
         }
 
         onClosed: {
+            // Check if board settings changed and ask if user wants to restart
+            if (gameSettings.gameDirty) {
+                // ask if user wants to start new game
+                gameSettings.gameDirty = false
+                startNewGame(true)
+            }
             gamePage.takeFocus()
         }
     }
@@ -234,40 +260,43 @@ ApplicationWindow {
         id: gamePage
 
         onGameOver: {
-            inPlay = false;
+            inPlay = false
             // TODO: Do something interesting...
         }
     }
 
     Component.onCompleted: {
         // test the settings interface
-        var version = settings.getNamedSetting("version");
-        console.log("version returned: "+version);
+        var version = settings.getNamedSetting("version")
+        console.log("version returned: "+version)
         if (version) {
-            console.log("version is "+version);
+            console.log("version is "+version)
         } else {
-            version = "0.1a1";
-            settings.setNamedSetting("version", version);
+            version = "0.1a2"
+            settings.setNamedSetting("version", version)
         }
 
         // Ping the server so it's alive when we want to generate a new board
-        SudokuGame.pingPuzzleServer();
+        SudokuGame.pingPuzzleServer()
 
         // Restore game if one was in progress
-        var gameData = settings.getNamedSetting("SavedGame");
+        var gameData = settings.getNamedSetting("SavedGame")
         if (gameData) {
-            inPlay = SudokuGame.restoreGame(gameData);
+            inPlay = SudokuGame.restoreGame(gameData)
+        } else {
+            // Start a new game
+            startNewGame()
         }
     }
 
     Component.onDestruction: {
         // if a game is in progress, save it
         if (inPlay) {
-            var gameData = SudokuGame.saveGame();
-            settings.setNamedSetting("SavedGame", gameData);
+            var gameData = SudokuGame.saveGame()
+            settings.setNamedSetting("SavedGame", gameData)
         } else {
             // make sure no game is saved
-            settings.setNamedSetting("SavedGame", null);
+            settings.setNamedSetting("SavedGame", null)
         }
     }
 }

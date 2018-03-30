@@ -21,9 +21,7 @@ TODO:
 - [X] License headers...
 - [X] Better board grid generation
 - [X] Change to use model/delegate model instead of JS array
-- [ ] Start new game on startup, if none in progress
-- [ ] Settings storage, remember things between launches
-- [ ] Save game on exit, restore on launch
+- [X] Start new game on startup, if none in progress
 - [ ] Gameplay statistics would be nice (not available during game play)
 	- [ ] Time spent each game
 	- [ ] Guesses made

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, David DeHaven, All Rights Reserved.
+ * Copyright (c) 2017, 2018, David DeHaven, All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,68 +22,149 @@
 
 import QtQuick 2.7
 import QtQuick.Controls 2.2
+import QtQuick.Layouts 1.3
 
 import "qrc:/sudoku/"
 
-GamePageForm {
+Item {
     id: root
+    width: 640
+    height: 480
+    property alias gridView: gridView
+    property alias gameDividers: gameDividers
 
-    signal gameOver();
+    signal gameOver()
 
     // The number we should highlight in the board
     property int highlightNumber: 0
 
     property int gridCellWidth: {
-        gridView.width / SudokuGame.rowSize;
+        gridView.width / SudokuGame.rowSize
     }
 
     property int gridCellHeight: {
-        gridView.height / SudokuGame.rowSize;
+        gridView.height / SudokuGame.rowSize
     }
 
     readonly property int activeRow: {
-        SudokuGame.rowForCell(gridView.currentIndex);
+        SudokuGame.rowForCell(gridView.currentIndex)
     }
 
     readonly property int activeColumn: {
-        SudokuGame.columnForCell(gridView.currentIndex);
+        SudokuGame.columnForCell(gridView.currentIndex)
     }
 
     readonly property int currentCellGuess: {
         if (gridView.currentIndex === -1) {
-            return -1;
+            return -1
         }
-        return SudokuGame.boardModel.get(gridView.currentIndex).cellGuess;
+        return SudokuGame.boardModel.get(gridView.currentIndex).cellGuess
     }
 
     function takeFocus() {
-        focus = true;
-        gamePage.gridView.focus = true;
+        focus = true
+        gamePage.gridView.focus = true
     }
 
     function reset() {
-        gridView.enabled = true;
-        takeFocus();
-        gamePage.gridView.currentIndex = -1;
-        highlightNumber = 0;
-        gamePage.gameDividers.refresh();
+        gridView.enabled = true
+        takeFocus()
+        gamePage.gridView.currentIndex = -1
+        highlightNumber = 0
+        gamePage.gameDividers.refresh()
     }
 
     function endGame() {
-        gridView.currentIndex = -1;
-        highlightNumber = -1;
-        gridView.enabled = false;
-        gameOver();
+        gridView.currentIndex = -1
+        highlightNumber = -1
+        gridView.enabled = false
+        gameOver()
     }
 
     function setCellGuess(index, guess) {
-        SudokuGame.setCellGuess(index, guess);
+        SudokuGame.setCellGuess(index, guess)
         // Highlight number if not clearing
         if (guess > 0) {
-            highlightNumber = guess;
+            highlightNumber = guess
         }
         if (SudokuGame.gameOverMan()) {
-            endGame();
+            endGame()
+        }
+    }
+
+    GridView {
+        id: gridView
+        x: 120
+        width: 432
+        height: 432
+        anchors.top: parent.top
+        anchors.topMargin: 20
+        anchors.horizontalCenter: parent.horizontalCenter
+        clip: true
+        boundsBehavior: Flickable.StopAtBounds
+        flickableDirection: Flickable.AutoFlickDirection
+        highlightRangeMode: GridView.ApplyRange
+        highlightFollowsCurrentItem: true
+        cellHeight: gridCellHeight
+        cellWidth: gridCellWidth
+
+        focus: true
+        keyNavigationWraps: false
+
+        highlight: cellHighlighter
+        delegate: gameCellDelegate
+        model: SudokuGame.boardModel
+
+        currentIndex: -1
+
+        GameDividers {
+            id: gameDividers
+            anchors.fill: parent
+            z: 1
+        }
+    }
+
+    ListView {
+        id: numberButtons
+        x: 26
+        y: 20
+        width: 40
+        height: 432
+        spacing: 9
+        clip: true
+        model: SudokuGame.rowSize
+        delegate: numberButtonDelegate
+    }
+
+    Rectangle {
+        id: busyBox
+        x: 156
+        y: 165
+        width: 328
+        height: 150
+        color: "#ffffc9"
+        radius: 10
+        border.width: 2
+        visible: SudokuGame.requestInProgress
+
+        BusyIndicator {
+            id: busyIndicator
+            x: 134
+            y: 73
+            running: true
+            z: 1
+        }
+
+        Text {
+            id: text1
+            x: 8
+            y: 8
+            width: 312
+            height: 59
+            text: qsTr("Requesting puzzle from server...")
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+            font.pointSize: 16
         }
     }
 
@@ -182,51 +263,51 @@ GamePageForm {
 
             property color numberColor: {
                 if (cellError && application.gameSettings.showCellErrors) {
-                    return "red";
+                    return "red"
                 } else if (application.gameSettings.highlightLikeNumbers &&
                            cellGuess > 0 && highlightNumber === cellGuess) {
-                    return "blue";
+                    return "blue"
                 }
-                return "black";
+                return "black"
             }
 
             focus: true
             Keys.onPressed: {
                 switch (event.key) {
                 case Qt.Key_Escape:
-                    gridView.currentIndex = -1;
-                    highlightNumber = 0;
-                    event.accepted = true;
-                    break;
+                    gridView.currentIndex = -1
+                    highlightNumber = 0
+                    event.accepted = true
+                    break
 
                 case Qt.Key_Left:
                     // prevent wrap to previous row
                     if (cellColumn === 0) {
-                        event.accepted = true;
+                        event.accepted = true
                     }
-                    break;
+                    break
 
                 case Qt.Key_Right:
                     // prevent wrap to next row
                     if (cellColumn === SudokuGame.rowSize-1) {
-                        event.accepted = true;
+                        event.accepted = true
                     }
-                    break;
+                    break
                 default:
                     if (!cellLocked) { // can't modify locked cells
-                        var numPressed = -1;
+                        var numPressed = -1
 
                         // Handle number key entry
                         // Key_0 = 0x30, Key_9 = 0x39, so we can just do some easy math here
                         if ((event.key >= Qt.Key_0) && (event.key <= Qt.Key_9)) {
-                            numPressed = event.key - Qt.Key_0;
+                            numPressed = event.key - Qt.Key_0
                         }
                         //  TODO: A-F for size 4 games
 
                         // zero key clears the current guess, so it's valid
                         if (numPressed >= 0 && numPressed <= SudokuGame.rowSize) {
-                            event.accepted = true;
-                            setCellGuess(gridView.currentIndex, numPressed);
+                            event.accepted = true
+                            setCellGuess(gridView.currentIndex, numPressed)
                         }
                     }
                 }
@@ -240,10 +321,10 @@ GamePageForm {
                     // make sure GridView has active focus when
                     // we click on it, otherwise subsequent key
                     // presses won't work
-                    takeFocus();
-                    gridView.currentIndex = cellIndex;
+                    takeFocus()
+                    gridView.currentIndex = cellIndex
                     if (cellGuess != 0) {
-                        highlightNumber = cellGuess;
+                        highlightNumber = cellGuess
                     }
                 }
             }

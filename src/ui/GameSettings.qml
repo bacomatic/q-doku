@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, David DeHaven, All Rights Reserved.
+ * Copyright (c) 2017, 2018, David DeHaven, All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -22,26 +22,40 @@
 
 import QtQuick 2.0
 import QtQuick.LocalStorage 2.0
+import "qrc:/sudoku"
 
 Item {
     property var db : null
 
     // Convenience accessors
     property int boardSize: 3
+    // flag to indicate that board settings have changed
+    property bool gameDirty: false
+
     property int randomSeed: 0
+
     property bool showCellErrors: true
     property bool highlightLikeNumbers: true
+
+    function setBoardSize(size) {
+        if (boardSize !== size) {
+            // don't dirty if we're setting to random size
+            // or changing from random to the current size
+            gameDirty = (size === 0) ? false : size !== SudokuGame.size
+            boardSize = size
+        }
+    }
 
     // returns an object containing "width" and "height" fields
     // FIXME: I probably won't use these, I need to implement resizeability first
     function getWindowSize() {
-        var size = getNamedSetting("WindowSize");
+        var size = getNamedSetting("WindowSize")
         // validate stored settings
         if (size && size.width && size.height) {
-            return size;
+            return size
         }
         // return null so we can use default setting
-        return null;
+        return null
     }
 
     // size must be an object containing "width" and "height"
@@ -53,88 +67,101 @@ Item {
                 width: size.width,
                 height: size.height
             }
-            setNamedSetting("WindowSize", obj);
+            setNamedSetting("WindowSize", obj)
         }
     }
 
     // Named setting accessors (things like window position/size, etc.)
-    function getNamedSetting(name) {
-        var result = null;
-        initDB();
+    function getNamedSetting(name, defaultValue) {
+        if (defaultValue === undefined) {
+            defaultValue = null
+        }
+
+        var result = null
+        initDB()
         if (!db || !name || name.length === 0) {
-            return; // FIXME: error handling
+            return // FIXME: error handling
         }
 
         db.transaction(
             function(tx) {
-                var res = tx.executeSql('SELECT * FROM settings WHERE name=?', [name]);
+                var res = tx.executeSql('SELECT * FROM settings WHERE name=?', [name])
                 if (res.rows.length >= 1) {
-                    var entry = res.rows[0];
+                    var entry = res.rows[0]
                     // !entry.value obliterates "false" and zero values
                     if (entry.value === null || entry.value === undefined) {
                         // Corrupt entry? Delete the bad row
-                        tx.executeSql('DELETE FROM settings WHERE name=?', [name]);
+                        tx.executeSql('DELETE FROM settings WHERE name=?', [name])
                     } else {
-                        result = JSON.parse(entry.value);
+                        result = JSON.parse(entry.value)
                     }
+                } else {
+                    result = defaultValue
                 }
             }
-        );
-        return result;
+        )
+        return result
     }
 
     function setNamedSetting(name, value) {
         // value can be null, in which case the setting will be deleted
-        initDB();
+        initDB()
         if (!db || !name || name.length === 0) {
-            return; // FIXME: Error handling
+            return // FIXME: Error handling
         }
 
         db.transaction(
             function(tx) {
                 // !value corrupts "false" and zero values
                 if (value !== null && value !== undefined) {
-                    var json = JSON.stringify(value);
-                    var res = tx.executeSql('SELECT * FROM settings WHERE name=?', [name]);
+                    var json = JSON.stringify(value)
+                    var res = tx.executeSql('SELECT * FROM settings WHERE name=?', [name])
                     if (res.rows.length === 1) {
-                        tx.executeSql('UPDATE settings SET value=? WHERE name=?', [json,name]);
+                        tx.executeSql('UPDATE settings SET value=? WHERE name=?', [json,name])
                     } else {
-                        tx.executeSql('INSERT INTO settings VALUES (?,?)', [name,json]);
+                        tx.executeSql('INSERT INTO settings VALUES (?,?)', [name,json])
                     }
                 } else {
-                    tx.executeSql('DELETE FROM settings WHERE name=?', [name]);
+                    tx.executeSql('DELETE FROM settings WHERE name=?', [name])
                 }
             }
-        );
+        )
     }
 
     function initDB() {
         if (!db) {
-            db = LocalStorage.openDatabaseSync("Q-Doku", "1.0", "Q-Doku game settings", 100000);
+            db = LocalStorage.openDatabaseSync("Q-Doku", "1.0", "Q-Doku game settings", 100000)
             db.transaction(
                 function(tx) {
                     // one table for storing named settings, each entry will contain JSON data
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS settings(name TEXT, value TEXT)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS settings(name TEXT, value TEXT)')
                 }
-            );
+            )
         }
     }
 
+    function loadSettings() {
+        boardSize = getNamedSetting("BoardSize", boardSize)
+        randomSeed = getNamedSetting("RandomSeed", randomSeed)
+        showCellErrors = getNamedSetting("ShowCellErrors", showCellErrors)
+        highlightLikeNumbers = getNamedSetting("HighlightLikeNumbers", highlightLikeNumbers)
+    }
+
+    function saveSettings() {
+        setNamedSetting("BoardSize", boardSize)
+        setNamedSetting("RandomSeed", randomSeed)
+        setNamedSetting("ShowCellErrors", showCellErrors)
+        setNamedSetting("HighlightLikeNumbers", highlightLikeNumbers)
+    }
+
     Component.onCompleted: {
-        // inialize the database
-        initDB();
-        // load settings
-        boardSize = getNamedSetting("BoardSize");
-        randomSeed = getNamedSetting("RandomSeed");
-        showCellErrors = getNamedSetting("ShowCellErrors");
-        highlightLikeNumbers = getNamedSetting("HighlightLikeNumbers");
+        // inialize the database and load settings
+        initDB()
+        loadSettings()
     }
 
     Component.onDestruction: {
         // Save settings before we exit
-        setNamedSetting("BoardSize", boardSize);
-        setNamedSetting("RandomSeed", randomSeed);
-        setNamedSetting("ShowCellErrors", showCellErrors);
-        setNamedSetting("HighlightLikeNumbers", highlightLikeNumbers);
+        saveSettings()
     }
 }

@@ -3,10 +3,8 @@
         <file>ui/main.qml</file>
         <file>ui/qtquickcontrols2.conf</file>
         <file>ui/GamePage.qml</file>
-        <file>ui/GamePageForm.ui.qml</file>
         <file>ui/GameDividers.qml</file>
         <file>ui/Settings.qml</file>
-        <file>ui/SettingsForm.ui.qml</file>
         <file>ui/GameSettings.qml</file>
     </qresource>
     <qresource prefix="/sudoku">

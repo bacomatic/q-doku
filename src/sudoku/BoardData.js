@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, David DeHaven, All Rights Reserved.
+ * Copyright (c) 2017, 2018, David DeHaven, All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -30,7 +30,7 @@ function postNewBoardRequest(size, seed) {
     var request = new XMLHttpRequest;
     // FIXME: change this when the puzzle API is done
     var reqURL = "https://sudoku-serve.herokuapp.com/sudoku/puzzles/demo?size="+size;
-    if (seed != 0) {
+    if (seed !== 0) {
         reqURL += "&randomSeed="+seed;
     }
 
