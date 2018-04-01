@@ -34,7 +34,9 @@ import "BoardData.js" as BoardData
  * FIXME: Use a loader instead of singleton.
  */
 
-QtObject {
+Item {
+    id: root
+
     // Actual board/puzzle properties
     property int size: 3
     readonly property int rowSize: {size * size}
@@ -48,7 +50,10 @@ QtObject {
     readonly property var boxList: []
 
     property bool requestInProgress: false
+
     // TODO: puzzle generator progress, when implemented in the server
+    // FIXME: Shouldn't be a property...
+    property var requestedPuzzleId: undefined
 
     // Save/restore feature
     // Game data is passed as an object, this will be serialized (to JSON) by GameSettings
@@ -117,16 +122,17 @@ QtObject {
         return !gameOverMan();
     }
 
-    function newBoard(newSize, randomSeed) {
-        // reset game state
+    function newBoard(newSize, randomSeed, demo) {
+        // if random size, randomly choose size
         if (newSize === 0) {
             size = Math.floor(Math.random() * 2) + 2; // should choose 2-3 inclusively
         } else {
             size = newSize;
         }
+        // random randomSeed is handled by server
         console.log("Generating board size = " + size + " cellCount = " + cellCount);
         requestInProgress = true;
-        BoardData.getPuzzle(size, randomSeed, puzzleReceived);
+        BoardData.requestPuzzle(size, randomSeed, demo, puzzleRequestCallback);
     }
 
     /*
@@ -324,5 +330,35 @@ QtObject {
         }
         console.log("Game over, man!");
         return true;
+    }
+
+    // Periodically poll the server to see if the puzzle is done being generated
+    Timer {
+        id: timer
+        interval: 250
+        repeat: false
+        onTriggered: {
+            if (requestedPuzzleId) {
+                var puzzleId = requestedPuzzleId
+                requestedPuzzleId = undefined
+
+                BoardData.getPuzzleWithId(puzzleId, puzzleRequestCallback)
+            }
+        }
+    }
+
+    function puzzleRequestCallback(puzzleInfo) {
+        // puzzle could be incomplete, in which case we
+        // set up a timer to poll again
+        if (puzzleInfo.puzzle && puzzleInfo.puzzle.length > 0) {
+            requestedPuzzleId = undefined
+            puzzleReceived(puzzleInfo)
+        } else if (puzzleInfo.puzzleId) {
+            // Not done, (re)start the timer to poll (again)
+            requestedPuzzleId = puzzleInfo.puzzleId
+            timer.start()
+        } else {
+            console.log("ERROR: Invalid puzzle received from server????")
+        }
     }
 }

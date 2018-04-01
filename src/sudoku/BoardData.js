@@ -22,50 +22,78 @@
 
 .pragma library
 
-var puzzleReceivedCallback = null;
+// We can only handle one request at a time
+var puzzleReceivedCallback = null
 
-// FIXME: Just roll this into SudokuGame? There isn't as much to it as I thought there would be.
+ var baseServerURL = "https://sudoku-serve.herokuapp.com/sudoku/puzzles"
+//var baseServerURL = "http://localhost:8080/sudoku/puzzles"
 
-function postNewBoardRequest(size, seed) {
-    var request = new XMLHttpRequest;
-    // FIXME: change this when the puzzle API is done
-    var reqURL = "https://sudoku-serve.herokuapp.com/sudoku/puzzles/demo?size="+size;
-    if (seed !== 0) {
-        reqURL += "&randomSeed="+seed;
-    }
-
-    request.open("GET", reqURL, true, null, null);
-    request.setRequestHeader("Accept-Type", "application/json");
-    request.onreadystatechange = function() {
-        if (request.readyState === XMLHttpRequest.DONE) {
-            if (request.status === 200) {
-                console.log("Request response: " + request.responseText);
-                var puzzleInfo = JSON.parse(request.responseText);
-                if (puzzleInfo.puzzle && (puzzleInfo.puzzle.length > 0)) {
-                    console.log("Full puzzle received, starting game!");
-                    puzzleReceivedCallback(puzzleInfo);
-                } else if (puzzleInfo.puzzleId) {
-                    // got a puzzleId, wait for it to be generated
-                    console.log("Puzzle being generated. Id = " + puzzleInfo.puzzleId);
-                    // periodically poll until it's done.
-                    // TODO: server doesn't support this yet, so leave this blank for now
-                } else {
-                    console.log("ERROR: Got response from puzzle request but invalid puzzle?? Abandoning request.");
-                }
+// readyState change handler, since it's common between the two requests we have here
+function puzzleRequestHandler(request) {
+    if (request.readyState === XMLHttpRequest.DONE) {
+        console.log("Request status: " + request.status)
+        if (request.status === 200) {
+            console.log("Request response: " + request.responseText)
+            var puzzleInfo = JSON.parse(request.responseText)
+            if (puzzleInfo.puzzleId) {
+                // Send it to the caller, even if it's still being generated
+                // Because we have no timer facilities here and to avoid
+                // callback hell
+                puzzleReceivedCallback(puzzleInfo)
             } else {
-                console.log("Error: " + request.statusText);
+                console.log("ERROR: Got response from puzzle request but invalid puzzle?? Abandoning request.")
             }
+        } else {
+            console.log("ERROR: " + request.statusText)
         }
     }
-    console.log("Sending puzzle request...");
-    request.send();
 }
 
-/*
- * Request a Sudoku puzzle from the server.
- */
-function getPuzzle(size, seed, callback) {
-    // Request puzzle from server
-    puzzleReceivedCallback = callback;
-    postNewBoardRequest(size, seed);
+function requestPuzzle(size, seed, demo, callback) {
+    var request = new XMLHttpRequest
+    var reqURL = baseServerURL
+    var reqType = "POST"
+
+    // FIXME: throw error if callback is undefined
+    puzzleReceivedCallback = callback
+
+    if (demo) {
+        // demo puzzles just use a GET /sudoku/puzzles/Demo-<size>
+        reqURL += "/Demo-"+size
+        reqType = "GET"
+    } else {
+        reqURL += "/new?size=" + size
+        if (seed !== 0) {
+            reqForm += "&randomSeed="+seed
+        }
+    }
+
+    request.open(reqType, reqURL, true, null, null)
+    request.setRequestHeader("Accept-Type", "application/json")
+    if (reqType === "POST") {
+        // Server needs this set, even though there is no body data allowed
+        request.setRequestHeader("Content-Type", "application/json")
+    }
+    // we need the request to process...
+    request.onreadystatechange = function() {
+        puzzleRequestHandler(request)
+    }
+    console.log("Sending puzzle request...")
+    request.send()
+}
+
+function getPuzzleWithId(puzzleId, callback) {
+    // Use XHR to GET
+    var request = new XMLHttpRequest
+    var reqURL = baseServerURL + "/" + puzzleId
+
+    puzzleReceivedCallback = callback
+
+    request.open("GET", reqURL, true, null, null)
+    request.setRequestHeader("Accept-Type", "application/json")
+    request.onreadystatechange = function() {
+        puzzleRequestHandler(request)
+    }
+    console.log("Sending puzzle request...")
+    request.send()
 }

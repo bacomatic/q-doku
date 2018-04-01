@@ -210,7 +210,7 @@ ApplicationWindow {
             newGameAlert.open()
         } else {
             inPlay = true
-            SudokuGame.newBoard(settings.boardSize, settings.randomSeed)
+            SudokuGame.newBoard(settings.boardSize, settings.randomSeed, settings.requestDemoBoards)
             gamePage.reset()
         }
     }

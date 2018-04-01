@@ -8,7 +8,7 @@ TODO:
 - [X] Restructure project so it isn't a pile of spaghetti
 - [X] Add actual backend support (fetch a puzzle)
 	- [X] Remove demo puzzles
-	- [ ] Request real puzzles, not demo puzzles
+	- [X] Request real puzzles, not demo puzzles
 - [X] Add game board to GamePage
 - [X] Add game logic
 	- [X] Add mouse selection and cell highlighting
@@ -52,7 +52,7 @@ Future enhancements:
 - [ ] Cloud storage (device dependent, e.g., iCloud for iOS)
 
 Features requiring backend work:
-- [ ] Actual puzzle generation
+- [X] Actual puzzle generation (from frontend perspective)
 - [ ] Puzzle generator progress
 - [ ] Selectable puzzle difficulties
 - [ ] Different configurations, e.g., Samurai boards
@@ -62,3 +62,4 @@ BUGS:
 - [X] Row/Col highlight bar doesn't animate shrinking when cell selection moves
 - [ ] Random seed dialog is uuuuuuugly (should be in New Game dialog)
 - [ ] Game board does not scale with window size, would be necessary for mobile devices
+- [ ] Changing to larger board leaves the old cells on the board while a new puzzle is being requested

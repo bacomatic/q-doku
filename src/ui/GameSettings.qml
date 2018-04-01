@@ -36,6 +36,7 @@ Item {
 
     property bool showCellErrors: true
     property bool highlightLikeNumbers: true
+    property bool requestDemoBoards: false
 
     function setBoardSize(size) {
         if (boardSize !== size) {
@@ -145,6 +146,7 @@ Item {
         randomSeed = getNamedSetting("RandomSeed", randomSeed)
         showCellErrors = getNamedSetting("ShowCellErrors", showCellErrors)
         highlightLikeNumbers = getNamedSetting("HighlightLikeNumbers", highlightLikeNumbers)
+        requestDemoBoards = getNamedSetting("RequestDemoBoards", requestDemoBoards)
     }
 
     function saveSettings() {
@@ -152,6 +154,7 @@ Item {
         setNamedSetting("RandomSeed", randomSeed)
         setNamedSetting("ShowCellErrors", showCellErrors)
         setNamedSetting("HighlightLikeNumbers", highlightLikeNumbers)
+        setNamedSetting("RequestDemoBoards", requestDemoBoards)
     }
 
     Component.onCompleted: {

@@ -63,6 +63,7 @@ Item {
                 checked: isChecked()
                 onClicked: {
                     application.gameSettings.setBoardSize(modelData.size)
+                    // Restore binding, otherwise it gets overwritten by a boolean value
                     checked = Qt.binding(isChecked)
                 }
             }
@@ -79,8 +80,10 @@ Item {
         checked: application.gameSettings.showCellErrors
         font.pointSize: 16
 
-        onClicked: application.gameSettings.showCellErrors
+        onClicked: {
+            application.gameSettings.showCellErrors
                    = !application.gameSettings.showCellErrors
+        }
     }
 
     CheckBox {
@@ -93,8 +96,26 @@ Item {
         checked: application.gameSettings.highlightLikeNumbers
         font.pointSize: 16
 
-        onClicked: application.gameSettings.highlightLikeNumbers
-                   = !application.gameSettings.highlightLikeNumbers
+        onClicked: {
+            application.gameSettings.highlightLikeNumbers
+               = !application.gameSettings.highlightLikeNumbers
+        }
+    }
+
+    CheckBox {
+        id: demoCB
+        x: 8
+        y: 340
+        width: 384
+        height: 40
+        text: qsTr("Use demo boards (DEVELOPMENT)")
+        checked: application.gameSettings.requestDemoBoards
+        font.pointSize: 16
+
+        onClicked: {
+            application.gameSettings.requestDemoBoards
+                = !application.gameSettings.requestDemoBoards
+        }
     }
 
     Button {

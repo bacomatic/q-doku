@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, David DeHaven, All Rights Reserved.
+ * Copyright (c) 2017, 2018, David DeHaven, All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -21,6 +21,7 @@
  */
 
 #include <QGuiApplication>
+#include <QLoggingCategory>
 #include <QQmlApplicationEngine>
 #include <QFile>
 #include <QIODevice>
@@ -34,8 +35,20 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
-    // FIXME: For debugging, remove for production
-    qInfo() << engine.offlineStorageDatabaseFilePath("Q-Doku") << "\n";
+    // For debugging purposes only
+    qDebug() << engine.offlineStorageDatabaseFilePath("Q-Doku") << "\n";
+
+    // Uncomment to debug various things, remove for production
+//    QLoggingCategory::setFilterRules(QStringLiteral(
+//        "*.debug=true\n"
+//        "qt.quick.hover*=false\n"
+//        "qt.scenegraph*=false\n"
+//        "qt.qpa*=false\n"
+//        "qt.quick.dirty*=false\n"
+//        "qt.quick.mouse*=false\n"
+//        "qt.quick.pointer*=false\n"
+//        "qt.qml.binding*=true\n"    // requires Qt 5.10+
+//    ));
 
     engine.addImportPath("qrc:/sudoku");
     engine.load(QUrl(QLatin1String("qrc:/ui/main.qml")));
